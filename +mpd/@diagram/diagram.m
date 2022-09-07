@@ -20,7 +20,7 @@ classdef diagram < handle
             
             % open fig
             self.fig = figure();
-%             self.fig.Color = [1 1 1]; % white background
+            %             self.fig.Color = [1 1 1]; % white background
             
             nChan = length(self.channel_type);
             y_space = 1/nChan;
@@ -34,10 +34,10 @@ classdef diagram < handle
                 ax(a).OuterPosition = [0.00 (nChan-a)*y_space 1.00 y_space*1.00];
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space 0.95 y_space*0.90];
                 
-                % now plot
+                % seperate objects
                 switch self.channel_type{a}
                     case 'RF'
-                        is_obj = cellfun(@(x) isa(x,'mpd.rf_pulse'), self.element_array);  
+                        is_obj = cellfun(@(x) isa(x,'mpd.rf_pulse'), self.element_array);
                         where_obj = find(is_obj);
                     case 'G_SS'
                         is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
@@ -54,24 +54,48 @@ classdef diagram < handle
                     case 'ADC'
                         is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
                         where_obj = find(is_obj);
-                    otherwise
-                        error('??')
                 end % switch
                 
-                for i = 1 : numel(where_obj)
-                    obj = self.element_array{where_obj(i)};
-                    plot( ax(a), ...
-                        [obj.onset obj.onset obj.offset obj.offset], ...
-                        [0 1 1 0] )
-                end
+                % plot curve
+                switch self.channel_type{a}
+                    
+                    case 'RF'
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            plot( ax(a), ...
+                                [obj.onset obj.onset obj.offset obj.offset], ...
+                                [0 1 1 0] )
+                        end
+                        
+                    case {'G_SS', 'G_PE', 'G_RO'}
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            plot( ax(a), ...
+                                [obj.onset obj.onset+obj.dur_ramp_up obj.onset+obj.dur_ramp_up+obj.dur_flattop obj.offset], ...
+                                [0 1 1 0] )
+                        end
+                        
+                    case 'ADC'
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            plot( ax(a), ...
+                                [obj.onset obj.onset obj.offset obj.offset], ...
+                                [0 1 1 0] )
+                        end
+                        
+                end % switch
                 
-                ax(a).XTick = [];
-                ax(a).YTick = [];
+                % make visal ajusments so each axes looks cleaner
+                ax(a).XTick              = [];
+                ax(a).YTick              = [];
                 ax(a).YLabel.Interpreter = 'none';
-                ax(a).YLabel.String = self.channel_type{a};
-                ax(a).XAxis.Color = ax(a).Parent.Color;
-                ax(a).YAxis.Color = ax(a).Parent.Color;
-                ax(a).YLabel.Color = [0 0 0];
+                ax(a).YLabel.String      = self.channel_type{a};
+                ax(a).XAxis.Color        = ax(a).Parent.Color;
+                ax(a).YAxis.Color        = ax(a).Parent.Color;
+                ax(a).YLabel.Color       = [0 0 0];
                 
             end % for
             
