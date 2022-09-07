@@ -1,12 +1,28 @@
 classdef diagram < handle
     
-    properties
+    properties( SetAccess = public )
+        
+        color_rf      = 'red'
+        color_grad_ss = 'blue'
+        color_grad_pe = 'magenta'
+        color_grad_ro = 'blue'
+        color_adc     = 'green'
+        
+        n_lob_sinc    = 2 % very approximatif
+        n_points      = 100
+        n_pe_line     = 5
+        
+    end % properties
+    
+    properties( SetAccess = protected )
+        
         element_array = {}
+        
         fig
         ax
+        
         channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}
-        n_lob_sinc    = 2 % very approximatif
-        n_points      = 100;
+        
     end % properties
     
     methods
@@ -46,32 +62,14 @@ classdef diagram < handle
                 ax(a).OuterPosition = [0.00 (nChan-a)*y_space 1.00 y_space*1.00];
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space 0.95 y_space*0.90];
                 
-                % seperate objects
-                switch self.channel_type{a}
-                    case 'RF'
-                        is_obj = cellfun(@(x) isa(x,'mpd.rf_pulse'), self.element_array);
-                        where_obj = find(is_obj);
-                    case 'G_SS'
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
-                        where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.slice_selection), self.element_array(where_obj)) );
-                    case 'G_PE'
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
-                        where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.phase_encoding), self.element_array(where_obj)) );
-                    case 'G_RO'
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
-                        where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.readout       ), self.element_array(where_obj)) );
-                    case 'ADC'
-                        is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
-                        where_obj = find(is_obj);
-                end % switch
-                
-                % plot curve
+                % seperate objects & plot curves
                 switch self.channel_type{a}
                     
-                    case 'RF'
+                    
+                    case 'RF' %--------------------------------------------
+                        
+                        is_obj = cellfun(@(x) isa(x,'mpd.rf_pulse'), self.element_array);
+                        where_obj = find(is_obj);
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
@@ -79,25 +77,69 @@ classdef diagram < handle
                             y = sinc( 2*pi*(self.n_lob_sinc)*(-self.n_points/2 : +self.n_points/2-1)/self.n_points );
                             plot( ax(a), ...
                                 t, ...
-                                y*obj.magnitude)
+                                y*obj.magnitude,...
+                                'Color',self.color_rf)
                         end
                         
-                    case {'G_SS', 'G_PE', 'G_RO'}
+                        
+                    case 'G_SS' %------------------------------------------
+                        
+                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        where_obj = find(is_obj);
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.slice_selection), self.element_array(where_obj)) );
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             plot( ax(a), ...
-                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset], ...
-                                [0          obj.magnitude              obj.magnitude                              0          ] )
+                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
+                                [0          obj.magnitude              obj.magnitude                              0          ], ...
+                                'Color',self.color_grad_ss)
                         end
                         
+                        
+                    case 'G_PE' %------------------------------------------
+                        
+                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        where_obj = find(is_obj);
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.phase_encoding), self.element_array(where_obj)) );
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            for line = -self.n_pe_line : self.n_pe_line
+                                plot( ax(a), ...
+                                    [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
+                                    [0          obj.magnitude              obj.magnitude                              0          ] * (line/self.n_pe_line), ...
+                                    'Color',self.color_grad_pe)
+                            end
+                        end
+                        
+                        
+                    case 'G_RO' %------------------------------------------
+                        
+                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        where_obj = find(is_obj);
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.readout       ), self.element_array(where_obj)) );
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            plot( ax(a), ...
+                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
+                                [0          obj.magnitude              obj.magnitude                              0          ], ...
+                                'Color',self.color_grad_ro)
+                        end
+                        
+                        
                     case 'ADC'
+                        
+                        is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
+                        where_obj = find(is_obj);
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             plot( ax(a), ...
                                 [obj.onset obj.onset     obj.offset     obj.offset], ...
-                                [0         obj.magnitude obj.magnitude  0         ] )
+                                [0         obj.magnitude obj.magnitude  0         ], ...
+                                'Color',self.color_adc)
                         end
                         
                 end % switch
