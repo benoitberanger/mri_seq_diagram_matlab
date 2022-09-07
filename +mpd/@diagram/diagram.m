@@ -45,9 +45,17 @@ classdef diagram < handle
                 assert(~isempty(self.element_array{el}.duration), '%s.duration empty', self.element_array{el}.name)
             end
             
+            % get first and last timepoint
+            t_min = 0;
+            t_max = 0;
+            for el = 1 : length(self.element_array)
+                t_min = min(t_min, self.element_array{el}.onset );
+                t_max = max(t_max, self.element_array{el}.offset);
+            end
+            
             % open fig
             self.fig = figure();
-            % self.fig.Color = [1 1 1]; % white background
+            self.fig.Color = [1 1 1]; % white background
             
             nChan = length(self.channel_type);
             y_space = 1/nChan;
@@ -59,8 +67,11 @@ classdef diagram < handle
                 ax(a) = axes(self.fig); %#ok<LAXES>
                 hold(ax(a), 'on')
                 
-                ax(a).OuterPosition = [0.00 (nChan-a)*y_space 1.00 y_space*1.00];
-                ax(a).InnerPosition = [0.05 (nChan-a)*y_space 0.95 y_space*0.90];
+                ax(a).OuterPosition = [0.00 (nChan-a)*y_space+0.00 1.00 y_space*1.00];
+                ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.95 y_space*0.90];
+                
+                X = [t_min t_max];
+                Y = [0     0    ];
                 
                 % seperate objects & plot curves
                 switch self.channel_type{a}
@@ -81,7 +92,6 @@ classdef diagram < handle
                                 'Color',self.color_rf)
                         end
                         
-                        
                     case 'G_SS' %------------------------------------------
                         
                         is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
@@ -95,7 +105,6 @@ classdef diagram < handle
                                 [0          obj.magnitude              obj.magnitude                              0          ], ...
                                 'Color',self.color_grad_ss)
                         end
-                        
                         
                     case 'G_PE' %------------------------------------------
                         
@@ -128,7 +137,6 @@ classdef diagram < handle
                                 'Color',self.color_grad_ro)
                         end
                         
-                        
                     case 'ADC'
                         
                         is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
@@ -144,14 +152,15 @@ classdef diagram < handle
                         
                 end % switch
                 
+                plot(ax(a), [t_min t_max], [0 0], 'Color', 'black', 'Linewidth', 0.5, 'LineStyle', ':')
+                
                 % make visal ajusments so each axes looks cleaner
-                ax(a).XTick              = [];
-                ax(a).YTick              = [];
                 ax(a).YLabel.Interpreter = 'none';
                 ax(a).YLabel.String      = self.channel_type{a};
                 ax(a).XAxis.Color        = ax(a).Parent.Color;
                 ax(a).YAxis.Color        = ax(a).Parent.Color;
                 ax(a).YLabel.Color       = [0 0 0];
+                ax(a).YLim               = [-1 +1];
                 
             end % for
             
