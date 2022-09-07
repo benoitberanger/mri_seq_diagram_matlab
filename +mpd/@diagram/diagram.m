@@ -1,10 +1,12 @@
 classdef diagram < handle
     
     properties
-        element_array cell
+        element_array = {}
         fig
         ax
-        channel_type = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}
+        channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}
+        n_lob_sinc    = 2 % very approximatif
+        n_points      = 100;
     end % properties
     
     methods
@@ -20,7 +22,7 @@ classdef diagram < handle
             
             % open fig
             self.fig = figure();
-            %             self.fig.Color = [1 1 1]; % white background
+            % self.fig.Color = [1 1 1]; % white background
             
             nChan = length(self.channel_type);
             y_space = 1/nChan;
@@ -50,7 +52,7 @@ classdef diagram < handle
                     case 'G_RO'
                         is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
                         where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.readout), self.element_array(where_obj)) );
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.readout       ), self.element_array(where_obj)) );
                     case 'ADC'
                         is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
                         where_obj = find(is_obj);
@@ -63,9 +65,11 @@ classdef diagram < handle
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
+                            t = linspace(obj.onset, obj.offset, self.n_points);
+                            y = sinc( 2*pi*(self.n_lob_sinc)*(-self.n_points/2 : +self.n_points/2-1)/self.n_points );
                             plot( ax(a), ...
-                                [obj.onset obj.onset obj.offset obj.offset], ...
-                                [0 1 1 0] )
+                                t, ...
+                                y)
                         end
                         
                     case {'G_SS', 'G_PE', 'G_RO'}

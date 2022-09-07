@@ -2,11 +2,11 @@ close all
 clear
 clc
 
-TR = 10;
-TE = 5;
+% TR = 10;
+% TE = 5;
 
 pulse_dur = 1;
-grad_dur = 1;
+grad_dur = 2;
 
 DIAGRAM           = mpd.diagram();
 
