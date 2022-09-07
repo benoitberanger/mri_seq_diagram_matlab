@@ -20,6 +20,15 @@ classdef diagram < handle
         
         function Draw( self )
             
+            % checks
+            for el = 1 : length(self.element_array)
+                assert(~isempty(self.element_array{el}.name    ), 'Element #%d have no name, please set it.', el)
+                assert(~isempty(self.element_array{el}.onset   ), '%s.onset empty'   , self.element_array{el}.name)
+                assert(~isempty(self.element_array{el}.middle  ), '%s.middle empty'  , self.element_array{el}.name)
+                assert(~isempty(self.element_array{el}.offset  ), '%s.offset empty'  , self.element_array{el}.name)
+                assert(~isempty(self.element_array{el}.duration), '%s.duration empty', self.element_array{el}.name)
+            end
+            
             % open fig
             self.fig = figure();
             % self.fig.Color = [1 1 1]; % white background
@@ -33,6 +42,7 @@ classdef diagram < handle
                 % create axes, the place holder hor each curve type == channel
                 ax(a) = axes(self.fig); %#ok<LAXES>
                 hold(ax(a), 'on')
+                
                 ax(a).OuterPosition = [0.00 (nChan-a)*y_space 1.00 y_space*1.00];
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space 0.95 y_space*0.90];
                 
@@ -69,7 +79,7 @@ classdef diagram < handle
                             y = sinc( 2*pi*(self.n_lob_sinc)*(-self.n_points/2 : +self.n_points/2-1)/self.n_points );
                             plot( ax(a), ...
                                 t, ...
-                                y)
+                                y*obj.magnitude)
                         end
                         
                     case {'G_SS', 'G_PE', 'G_RO'}
@@ -77,8 +87,8 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             plot( ax(a), ...
-                                [obj.onset obj.onset+obj.dur_ramp_up obj.onset+obj.dur_ramp_up+obj.dur_flattop obj.offset], ...
-                                [0 1 1 0] )
+                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset], ...
+                                [0          obj.magnitude              obj.magnitude                              0          ] )
                         end
                         
                     case 'ADC'
@@ -86,8 +96,8 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             plot( ax(a), ...
-                                [obj.onset obj.onset obj.offset obj.offset], ...
-                                [0 1 1 0] )
+                                [obj.onset obj.onset     obj.offset     obj.offset], ...
+                                [0         obj.magnitude obj.magnitude  0         ] )
                         end
                         
                 end % switch

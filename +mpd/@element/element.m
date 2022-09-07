@@ -2,6 +2,8 @@ classdef element < handle & matlab.mixin.Copyable
     
     properties
         
+        name       char
+        
         % time stuff
         
         %- for plot
@@ -21,6 +23,13 @@ classdef element < handle & matlab.mixin.Copyable
     
     methods
         
+        function self = element(name)
+            if nargin < 1
+                return
+            end
+            self.name = name;
+        end % function
+        
         function set_as_initial_element( self )
             assert( ~isempty(self.duration), 'duration must be set')
             self.onset  = 0;
@@ -33,6 +42,13 @@ classdef element < handle & matlab.mixin.Copyable
             self.offset = self.onset + self.duration;
             self.middle = self.onset + self.duration/2;
         end % function
+        
+        function new = deepcopy(self, name)
+            new = self.copy();
+            if nargin > 1
+                new.name = name;
+            end
+        end
         
     end % methods
     
