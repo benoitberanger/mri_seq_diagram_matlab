@@ -9,7 +9,7 @@ classdef diagram < handle
         color_adc     = 'green'
         
         n_lob_sinc    = 2 % very approximatif
-        n_points      = 100
+        n_points      = 100 % definition of the SINC (RF pulse)
         n_pe_line     = 5
         
     end % properties
