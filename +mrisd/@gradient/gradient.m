@@ -1,4 +1,4 @@
-classdef gradient < mpd.element
+classdef gradient < mrisd.element
     
     properties
         type          char

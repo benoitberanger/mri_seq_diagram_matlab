@@ -1,7 +1,7 @@
-classdef rf_pulse < mpd.element
+classdef adc < mrisd.element
     
     properties
-        flip_angle double
+        
     end % properties
     
     methods

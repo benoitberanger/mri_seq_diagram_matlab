@@ -18,7 +18,7 @@ classdef element < handle & matlab.mixin.Copyable
         magnitude  double = 1 % like a scaling factor
         
         % pointer
-        diagram    mpd.diagram
+        diagram    mrisd.diagram
     end % properties
     
     methods

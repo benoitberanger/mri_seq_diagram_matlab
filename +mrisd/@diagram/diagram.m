@@ -27,22 +27,61 @@ classdef diagram < handle
     
     methods
         
-        function add_element(self, element_array)
-            for i = 1 : numel(element_array)
-                self.element_array{end+1} = element_array{i};
-                element_array{i}.diagram = self; % copy a pointer
+        %------------------------------------------------------------------
+        function obj = add_rf_pulse(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj = self.add_element('mrisd.rf_pulse', name);
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_gradient(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj = self.add_element('mrisd.gradient', name);
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_adc(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj = self.add_element('mrisd.adc', name);
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_element(self, type, name)
+            obj         = feval(type);
+            obj.name    = name;
+            obj.diagram = self;
+            self.store_element(obj);
+        end % function
+        
+        %------------------------------------------------------------------
+        function store_element(self, element_array)
+            if iscell(element_array)
+                for i = 1 : numel(element_array)
+                    self.element_array{end+1} = element_array{i};
+                    element_array{i}.diagram = self; % copy a pointer
+                end
+            else
+                self.element_array{end+1} = element_array;
             end
         end % function
         
+        %------------------------------------------------------------------
         function Draw( self )
             
             % checks
             for el = 1 : length(self.element_array)
-                assert(~isempty(self.element_array{el}.name    ), 'Element #%d have no name, please set it.', el)
-                assert(~isempty(self.element_array{el}.onset   ), '%s.onset empty'   , self.element_array{el}.name)
-                assert(~isempty(self.element_array{el}.middle  ), '%s.middle empty'  , self.element_array{el}.name)
-                assert(~isempty(self.element_array{el}.offset  ), '%s.offset empty'  , self.element_array{el}.name)
-                assert(~isempty(self.element_array{el}.duration), '%s.duration empty', self.element_array{el}.name)
+                obj = self.element_array{el}; % shortcut (just a pointer copy)
+                assert(~isempty(obj.name    ), 'Element #%d, <%s> have no name, please set it.', el, class(obj))
+                assert(~isempty(obj.onset   ), '%s.onset empty'   , obj.name)
+                assert(~isempty(obj.middle  ), '%s.middle empty'  , obj.name)
+                assert(~isempty(obj.offset  ), '%s.offset empty'  , obj.name)
+                assert(~isempty(obj.duration), '%s.duration empty', obj.name)
             end
             
             % get first and last timepoint
@@ -79,7 +118,7 @@ classdef diagram < handle
                     
                     case 'RF' %--------------------------------------------
                         
-                        is_obj = cellfun(@(x) isa(x,'mpd.rf_pulse'), self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.rf_pulse'), self.element_array);
                         where_obj = find(is_obj);
                         
                         for i = 1 : numel(where_obj)
@@ -94,9 +133,9 @@ classdef diagram < handle
                         
                     case 'G_SS' %------------------------------------------
                         
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.gradient'), self.element_array);
                         where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.slice_selection), self.element_array(where_obj)) );
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.slice_selection), self.element_array(where_obj)) );
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
@@ -108,9 +147,9 @@ classdef diagram < handle
                         
                     case 'G_PE' %------------------------------------------
                         
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.gradient'), self.element_array);
                         where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.phase_encoding), self.element_array(where_obj)) );
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.phase_encoding), self.element_array(where_obj)) );
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
@@ -125,9 +164,9 @@ classdef diagram < handle
                         
                     case 'G_RO' %------------------------------------------
                         
-                        is_obj = cellfun(@(x) isa(x,'mpd.gradient'), self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.gradient'), self.element_array);
                         where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mpd.grad_type.readout       ), self.element_array(where_obj)) );
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.readout       ), self.element_array(where_obj)) );
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
@@ -139,7 +178,7 @@ classdef diagram < handle
                         
                     case 'ADC'
                         
-                        is_obj = cellfun(@(x) isa(x,'mpd.adc')     , self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.adc')     , self.element_array);
                         where_obj = find(is_obj);
                         
                         for i = 1 : numel(where_obj)
