@@ -4,7 +4,6 @@ classdef diagram < handle
         
         color_rf      = 'red'
         color_grad_ss = 'blue'
-        color_grad_pe = 'magenta'
         color_grad_ro = 'blue'
         color_adc     = 'green'
         
@@ -151,13 +150,21 @@ classdef diagram < handle
                         where_obj = find(is_obj);
                         where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.phase_encoding), self.element_array(where_obj)) );
                         
+                        % specific color magment, we use jet (from blue to red) to show early vs late phase encoding lines
+                        colors = jet(2*self.n_pe_line+1);
+                        if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
+                            colors = flipud(colors);
+                        end
+                        
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
+                            count = 0;
                             for line = -self.n_pe_line : self.n_pe_line
+                                count = count + 1;
                                 plot( ax(a), ...
                                     [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
-                                    [0          obj.magnitude              obj.magnitude                              0          ] * (line/self.n_pe_line), ...
-                                    'Color',self.color_grad_pe)
+                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/self.n_pe_line), ...
+                                    'Color',colors(count,:))
                             end
                         end
                         
