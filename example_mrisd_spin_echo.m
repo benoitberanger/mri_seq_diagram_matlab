@@ -10,8 +10,7 @@ grad_dur = 2;
 
 
 %% Create the diagram object
-% "channel" types are {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}. Each channel
-% is one curve container.
+% "channel" types are {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}. Each channe is one curve container.
 % Gradients are seperated into "logical" axis : slice selective, phase encoding, readout
 % This seperation is done by filling .type, using an enumeration. Don't worry, its makes useful and very simple tu use.
 
@@ -22,9 +21,9 @@ DIAGRAM = mrisd.diagram();
 %
 % Each element (rf_pulse, gradient, adc) have 4 timing values :
 % - onset
-% - middle (duration/2 by default)
+% - middle (default : duration/2)
 % - offset
-% - duration (offset-onset by default)
+% - duration (default : offset-onset)
 %
 % And gradients have also :
 % - dur_ramp_up
@@ -57,8 +56,8 @@ G_SS090rew.set_total_duration(RF_090.duration/2); % will set all .dur*, but no .
 G_SS090rew.set_onset_at_elem_offset(G_SS090set);
 
 % Create PhaseEncoding Gradient "setter"
-G_PEset              = DIAGRAM.add_gradient('G_PEset');
-G_PEset.type         = mrisd.grad_type.phase_encoding;
+G_PEset      = DIAGRAM.add_gradient('G_PEset');
+G_PEset.type = mrisd.grad_type.phase_encoding;
 
 % Timings
 G_PEset.set_total_duration(grad_dur); % will set all duration, but no onset or offset

@@ -109,9 +109,6 @@ classdef diagram < handle
                 ax(a).OuterPosition = [0.00 (nChan-a)*y_space+0.00 1.00 y_space*1.00];
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.95 y_space*0.90];
                 
-                X = [t_min t_max];
-                Y = [0     0    ];
-                
                 % seperate objects & plot curves
                 switch self.channel_type{a}
                     
@@ -176,7 +173,7 @@ classdef diagram < handle
                                 'Color',self.color_grad_ro)
                         end
                         
-                    case 'ADC'
+                    case 'ADC' %-------------------------------------------
                         
                         is_obj = cellfun(@(x) isa(x,'mrisd.adc')     , self.element_array);
                         where_obj = find(is_obj);
