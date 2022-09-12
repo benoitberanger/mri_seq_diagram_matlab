@@ -82,6 +82,9 @@ classdef diagram < handle
                 assert(~isempty(obj.middle  ), '%s.middle empty'  , obj.name)
                 assert(~isempty(obj.offset  ), '%s.offset empty'  , obj.name)
                 assert(~isempty(obj.duration), '%s.duration empty', obj.name)
+                assert(isa(obj,'mrisd.gradient') && ~isempty(obj.dur_ramp_up  ), '%s.dur_ramp_up is empty'  , obj.name)
+                assert(isa(obj,'mrisd.gradient') && ~isempty(obj.dur_flattop  ), '%s.dur_flattop is empty'  , obj.name)
+                assert(isa(obj,'mrisd.gradient') && ~isempty(obj.dur_ramp_down), '%s.dur_ramp_down is empty', obj.name)
             end
             
             % get first and last timepoint

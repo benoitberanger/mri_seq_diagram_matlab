@@ -4,6 +4,9 @@
 *.fig
 *.mat
 
+# specific
+/test
+
 # Octave
 octave-workspace
 
