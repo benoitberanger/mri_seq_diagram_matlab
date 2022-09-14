@@ -1,10 +1,10 @@
 classdef adc < mrisd.element
     
-    properties
+    properties (SetAccess = public)
         
     end % properties
     
-    methods
+    methods (Access = public)
         
         function set_onset_at_grad_flattop( self, gradient )
             self.onset  = gradient.onset + gradient.dur_ramp_up;

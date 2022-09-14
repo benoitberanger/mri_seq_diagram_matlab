@@ -7,9 +7,9 @@ classdef diagram < handle
         color_grad_ro = 'blue'
         color_adc     = 'green'
         
-        n_lob_sinc    = 2 % very approximatif
-        n_points      = 100 % definition of the SINC (RF pulse)
-        n_pe_line     = 5
+        sinc_n_lob    = 2 % very approximatif (for now)
+        sinc_n_points = 100 % definition of the SINC (RF pulse)
+        pe_n_lines    = 5
         
     end % properties
     
@@ -24,7 +24,7 @@ classdef diagram < handle
         
     end % properties
     
-    methods
+    methods (Access = public)
         
         %------------------------------------------------------------------
         function obj = add_rf_pulse(self, name)
@@ -122,8 +122,8 @@ classdef diagram < handle
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
-                            t = linspace(obj.onset, obj.offset, self.n_points);
-                            y = sinc( 2*pi*(self.n_lob_sinc)*(-self.n_points/2 : +self.n_points/2-1)/self.n_points );
+                            t = linspace(obj.onset, obj.offset, self.sinc_n_points);
+                            y = sinc( 2*pi*(self.sinc_n_lob)*(-self.sinc_n_points/2 : +self.sinc_n_points/2-1)/self.sinc_n_points );
                             plot( ax(a), ...
                                 t, ...
                                 y*obj.magnitude,...
@@ -151,7 +151,7 @@ classdef diagram < handle
                         where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.phase_encoding), self.element_array(where_obj)) );
                         
                         % specific color magment, we use jet (from blue to red) to show early vs late phase encoding lines
-                        colors = jet(2*self.n_pe_line+1);
+                        colors = jet(2*self.pe_n_lines+1);
                         if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
                             colors = flipud(colors);
                         end
@@ -159,11 +159,11 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             count = 0;
-                            for line = -self.n_pe_line : self.n_pe_line
+                            for line = -self.pe_n_lines : self.pe_n_lines
                                 count = count + 1;
                                 plot( ax(a), ...
                                     [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
-                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/self.n_pe_line), ...
+                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/self.pe_n_lines), ...
                                     'Color',colors(count,:))
                             end
                         end
@@ -214,6 +214,67 @@ classdef diagram < handle
             self.ax = ax; %#ok<*PROP>
             
         end % function
+        
+    end % methods
+    
+    
+    methods % set methods, so the user can use which ever syntax he prefer
+        
+        % color_rf
+        function set_color_rf(self, color_rf)
+            self.color_rf = color_rf; % this calls the set method just bellow
+        end
+        function set.color_rf(self, color_rf)
+            self.color_rf = color_rf;
+        end
+        
+        % color_grad_ss
+        function set_color_grad_ss(self, color_grad_ss)
+            self.color_grad_ss = color_grad_ss; % this calls the set method just bellow
+        end
+        function set.color_grad_ss(self, color_grad_ss)
+            self.color_grad_ss = color_grad_ss;
+        end
+        
+        % color_grad_ro
+        function set_color_grad_ro(self, color_grad_ro)
+            self.color_grad_ro = color_grad_ro; % this calls the set method just bellow
+        end
+        function set.color_grad_ro(self, color_grad_ro)
+            self.color_grad_ro = color_grad_ro;
+        end
+        
+        % color_adc
+        function set_color_adc(self, color_adc)
+            self.color_adc = color_adc; % this calls the set method just bellow
+        end
+        function set.color_adc(self, color_adc)
+            self.color_adc = color_adc;
+        end
+        
+        % sinc_n_lob
+        function set_sinc_n_lob(self, sinc_n_lob)
+            self.sinc_n_lob = sinc_n_lob; % this calls the set method just bellow
+        end
+        function set.sinc_n_lob(self, sinc_n_lob)
+            self.sinc_n_lob = sinc_n_lob;
+        end
+        
+         % sinc_n_points
+        function set_sinc_n_points(self, sinc_n_points)
+            self.sinc_n_points = sinc_n_points; % this calls the set method just bellow
+        end
+        function set.sinc_n_points(self, sinc_n_points)
+            self.sinc_n_points = sinc_n_points;
+        end
+        
+        % pe_n_lines
+        function set_pe_n_lines(self, pe_n_lines)
+            self.pe_n_lines = pe_n_lines; % this calls the set method just bellow
+        end
+        function set.pe_n_lines(self, pe_n_lines)
+            self.pe_n_lines = pe_n_lines;
+        end
         
     end % methods
     
