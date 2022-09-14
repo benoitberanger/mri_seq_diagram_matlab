@@ -7,8 +7,8 @@ classdef diagram < handle
         color_grad_ro = 'blue'
         color_adc     = 'green'
         
-        sinc_n_lob    = 2 % very approximatif (for now)
-        sinc_n_points = 100 % definition of the SINC (RF pulse)
+        sinc_n_lob    = 2 % integer values, { 0 (no lob), 1, 2, 3, ...}
+        sinc_n_points = 1000 % definition of the SINC (RF pulse)
         pe_n_lines    = 5
         
     end % properties
@@ -122,10 +122,11 @@ classdef diagram < handle
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
-                            t = linspace(obj.onset, obj.offset, self.sinc_n_points);
-                            y = sinc( 2*pi*(self.sinc_n_lob)*(-self.sinc_n_points/2 : +self.sinc_n_points/2-1)/self.sinc_n_points );
+                            t = linspace(-(2*self.sinc_n_lob+1), +(2*self.sinc_n_lob+1), self.sinc_n_points);
+                            y = sinc( t );
+                            x = linspace(obj.onset, obj.offset, self.sinc_n_points);
                             plot( ax(a), ...
-                                t, ...
+                                x, ...
                                 y*obj.magnitude,...
                                 'Color',self.color_rf)
                         end
