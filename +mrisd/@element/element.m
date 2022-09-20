@@ -34,7 +34,10 @@ classdef element < handle & matlab.mixin.Copyable
         end % function
         
         %------------------------------------------------------------------
-        function set_as_initial_element( self )
+        function set_as_initial_element( self, duration )
+            if nargin > 1
+                self.duration = duration;
+            end
             assert( ~isempty(self.duration), 'duration must be set')
             self.onset  = 0;
             self.offset = self.duration;
@@ -47,6 +50,34 @@ classdef element < handle & matlab.mixin.Copyable
             self.offset = self.onset + self.duration;
             self.middle = self.onset + self.duration/2;
         end % function
+        
+        %------------------------------------------------------------------
+        function set_onset_at_elem_onset( self, elem )
+            self.onset  = elem.onset;
+            self.offset = self.onset + self.duration;
+            self.middle = self.onset + self.duration/2;
+        end % function
+        
+        %------------------------------------------------------------------
+        function set_offset_at_elem_offset( self, elem )
+            self.offset = elem.offset;
+            self.onset  = self.offset - self.duration;
+            self.middle = self.offset - self.duration/2;
+        end % function
+        
+        %------------------------------------------------------------------
+        function set_offset_at_elem_onset( self, elem )
+            self.offset = elem.onset;
+            self.onset  = self.offset - self.duration;
+            self.middle = self.offset - self.duration/2;
+        end % function
+        
+        %------------------------------------------------------------------
+        function set_middle_using_TE(self, TE)
+            self.middle = TE;
+            self.onset  = TE - self.duration/2;
+            self.offset = TE + self.duration/2;
+        end
         
         %------------------------------------------------------------------
         function new = deepcopy(self, name)

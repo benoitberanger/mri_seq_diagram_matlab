@@ -32,7 +32,7 @@ classdef gradient < mrisd.element
             self.duration = self.dur_ramp_up + self.dur_flattop + self.dur_ramp_down;
             self.onset    = rf_obj.onset - self.dur_ramp_up;
             self.offset   = self.onset + self.duration;
-            self.offset   = self.onset + self.dur_ramp_up + self.dur_flattop/2;
+            self.middle   = self.onset + self.dur_ramp_up + self.dur_flattop/2;
         end
         
         function set_flattop_on_adc( self, adc_obj, dur_ramp_up, dur_ramp_down )
@@ -51,7 +51,7 @@ classdef gradient < mrisd.element
             self.duration = self.dur_ramp_up + self.dur_flattop + self.dur_ramp_down;
             self.onset    = adc_obj.onset - self.dur_ramp_up;
             self.offset   = self.onset + self.duration;
-            self.offset   = self.onset + self.dur_ramp_up + self.dur_flattop/2;
+            self.middle   = self.onset + self.dur_ramp_up + self.dur_flattop/2;
         end
         
     end % methods

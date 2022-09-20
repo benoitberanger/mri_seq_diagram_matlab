@@ -7,6 +7,7 @@ clc
 % motsly for time axis scaling
 pulse_dur = 1;
 grad_dur = 2;
+TE = 10; % this places ADC middle (and RF middle if needed)
 
 
 %% Create the diagram object
@@ -36,6 +37,13 @@ RF_090            = DIAGRAM.add_rf_pulse('RF_090');
 RF_090.flip_angle = 90;
 RF_090.magnitude  = 0.5; % half the magnitude(1) because there will be a 180° pulse
 
+% Create RF refocusing
+RF_180 = DIAGRAM.add_rf_pulse('RF_180');
+RF_180.set_flip_angle(180);
+
+% Create ADC
+ADC = DIAGRAM.add_adc('ADC');
+
 % Create SliceSelective Gradient "setter"
 G_SS090set      = DIAGRAM.add_gradient('G_SS090set');
 G_SS090set.type = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
@@ -49,16 +57,9 @@ G_SS090rew.set_magnitude(-1);
 G_PEset      = DIAGRAM.add_gradient('G_PEset');
 G_PEset.type = mrisd.grad_type.phase_encoding;
 
-% Create RF refocusing
-RF_180 = DIAGRAM.add_rf_pulse('RF_180');
-RF_180.set_flip_angle(180);
-
 % Create SliceRefocussing Gradient "setter"
 G_SS180set = DIAGRAM.add_gradient('G_SS180set');
 G_SS180set.set_type(mrisd.grad_type.slice_selection); % grad_type is an enumeration, use [TAB] for auto-completion
-
-% Create ADC
-ADC = DIAGRAM.add_adc('ADC');
 
 % Create ReadOut gradient "prephase"
 G_ROpre           = DIAGRAM.add_gradient('G_ROpre');
@@ -84,10 +85,19 @@ G_ROadc.set_type(mrisd.grad_type.readout);
 % - dur_ramp_down  (duration = dur_ramp_up + dur_flattop + dur_ramp_down)
 %
 
-RF_090.duration = pulse_dur; % mostly used for scaling the time axis
-G_SS090set.set_flattop_on_rf(RF_090); % will set .dur*
-G_SS090set.set_as_initial_element();  % begining of the diagram, .onset=0
-RF_090.set_onset_at_grad_flattop(G_SS090set); % will set .onset and .offset
+% Place the main objects, used to define TE, TE/2, ...
+
+RF_090.set_as_initial_element(pulse_dur); % set duration(use input argument), .onset = 0, ...
+
+RF_180.duration = pulse_dur;
+RF_180.set_middle_using_TE(RF_090.middle + TE/2); % this sets .middle, then the rest (onset/offset/duration)
+
+ADC.duration = grad_dur;
+ADC.set_middle_using_TE(RF_090.middle + TE);
+
+% Now place gradients
+
+G_SS090set.set_flattop_on_rf(RF_090); % will set all timings
 
 G_SS090rew.set_total_duration(RF_090.duration/2); % will set all .dur*, but no .onset or .offset
 G_SS090rew.set_onset_at_elem_offset(G_SS090set);
@@ -95,20 +105,11 @@ G_SS090rew.set_onset_at_elem_offset(G_SS090set);
 G_PEset.set_total_duration(grad_dur);
 G_PEset.set_onset_at_elem_offset(G_SS090rew);
 
-RF_180.duration = pulse_dur;
-
 G_SS180set.set_flattop_on_rf(RF_180);
-G_SS180set.set_onset_at_elem_offset(G_PEset);
-RF_180.set_onset_at_grad_flattop(G_SS180set);
-
-ADC.duration = grad_dur;
-
-G_ROpre.set_total_duration(ADC.duration/2);
-G_ROpre.set_onset_at_elem_offset(G_SS180set);
 
 G_ROadc.set_flattop_on_adc(ADC);
-G_ROadc.set_onset_at_elem_offset(G_ROpre);
-ADC.set_onset_at_grad_flattop(G_ROadc);
+G_ROpre.set_total_duration(ADC.duration/2);
+G_ROpre.set_offset_at_elem_onset(G_ROadc);
 
 
 %% Now we draw
