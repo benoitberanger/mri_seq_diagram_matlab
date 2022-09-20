@@ -107,9 +107,11 @@ classdef diagram < handle
                 % create axes, the place holder hor each curve type == channel
                 ax(a) = axes(self.fig); %#ok<LAXES>
                 hold(ax(a), 'on')
+                ax(a).XLim = [t_min t_max];
                 
-                ax(a).OuterPosition = [0.00 (nChan-a)*y_space+0.00 1.00 y_space*1.00];
-                ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.95 y_space*0.90];
+                % on a figure, (0,0) "origin" point is at bottom left corner
+                %                      x    y                      w    h
+                ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.94 y_space*0.90];
                 
                 % seperate objects & plot curves
                 switch self.channel_type{a}
@@ -151,14 +153,16 @@ classdef diagram < handle
                         where_obj = find(is_obj);
                         where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.phase_encoding), self.element_array(where_obj)) );
                         
-                        % specific color magment, we use jet (from blue to red) to show early vs late phase encoding lines
-                        colors = jet(2*self.pe_n_lines+1);
-                        if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
-                            colors = flipud(colors);
-                        end
-                        
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
+                            
+                            % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
+                            colors = jet(2*self.pe_n_lines+1);
+                            
+                            if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
+                                colors = flipud(colors);
+                            end
+                            
                             count = 0;
                             for line = -self.pe_n_lines : self.pe_n_lines
                                 count = count + 1;
@@ -166,9 +170,14 @@ classdef diagram < handle
                                     [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
                                     [0          obj.magnitude              obj.magnitude                              0         ] * (line/self.pe_n_lines), ...
                                     'Color',colors(count,:))
+                            end                            
+                            if sign(obj.magnitude) == 1
+                                y_arraow = +[ax(a).Position(2)                   ax(a).Position(2)+ax(a).Position(4)]*obj.magnitude;
+                            else
+                                y_arraow = -[ax(a).Position(2)+ax(a).Position(4) ax(a).Position(2)                  ]*obj.magnitude;
                             end
+                            annotation(self.fig,'arrow', [1 1]*(ax(a).Position(1) + (obj.onset-t_min)*ax(a).Position(3)/(t_max-t_min)), y_arraow)
                         end
-                        
                         
                     case 'G_RO' %------------------------------------------
                         
@@ -180,13 +189,13 @@ classdef diagram < handle
                             obj = self.element_array{where_obj(i)};
                             plot( ax(a), ...
                                 [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
-                                [0          obj.magnitude              obj.magnitude                              0          ], ...
+                                [0          obj.magnitude              obj.magnitude                              0         ], ...
                                 'Color',self.color_grad_ro)
                         end
                         
                     case 'ADC' %-------------------------------------------
                         
-                        is_obj = cellfun(@(x) isa(x,'mrisd.adc')     , self.element_array);
+                        is_obj = cellfun(@(x) isa(x,'mrisd.adc'), self.element_array);
                         where_obj = find(is_obj);
                         
                         for i = 1 : numel(where_obj)
@@ -208,7 +217,10 @@ classdef diagram < handle
                 ax(a).YAxis.Color        = ax(a).Parent.Color;
                 ax(a).YLabel.Color       = [0 0 0];
                 ax(a).YLim               = [-1 +1];
-                
+                ax(a).XLim               = [t_min t_max];
+                ax(a).FontWeight         = 'bold';
+                ax(a).XTick              = [];
+                ax(a).YTick              = [];
             end % for
             
             linkaxes(ax,'x')
