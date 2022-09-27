@@ -3,13 +3,19 @@ classdef diagram < handle
     properties( SetAccess = public )
         
         color_rf      = 'red'
-        color_grad_ss = 'blue'
-        color_grad_ro = 'blue'
-        color_adc     = 'green'
+        color_grad_ss = 'black'
+        color_grad_ro = 'black'
+        color_adc     = [0.5 0.5 0.5] % gray
+        color_echo    = 'blue'
         
-        sinc_n_lob    = 2 % integer values, { 0 (no lob), 1, 2, 3, ...}
-        sinc_n_points = 1000 % definition of the SINC (RF pulse)
+        sinc_n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
+        sinc_n_points = 100 % definition of the SINC (RF pulse)
+        
         pe_n_lines    = 5
+        
+        echo_n_lob    = 10;  % integer values, { 0 (no lob), 1, 2, 3, ...}
+        echo_n_points = 1000 % definition of the sin wave with exponential envelope
+        echo_lob_decay= 2;   % lob number with half the height
         
     end % properties
     
@@ -48,6 +54,14 @@ classdef diagram < handle
                 name = '';
             end
             obj = self.add_element('mrisd.adc', name);
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_echo(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj = self.add_element('mrisd.echo', name);
         end % function
         
         %------------------------------------------------------------------
@@ -195,6 +209,7 @@ classdef diagram < handle
                         
                     case 'ADC' %-------------------------------------------
                         
+                        % ADC
                         is_obj = cellfun(@(x) isa(x,'mrisd.adc'), self.element_array);
                         where_obj = find(is_obj);
                         
@@ -204,6 +219,32 @@ classdef diagram < handle
                                 [obj.onset obj.onset     obj.offset     obj.offset], ...
                                 [0         obj.magnitude obj.magnitude  0         ], ...
                                 'Color',self.color_adc)
+                        end
+                        
+                        % Echo
+                        is_obj = cellfun(@(x) isa(x,'mrisd.echo'), self.element_array);
+                        where_obj = find(is_obj);
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            
+                            t = linspace(0, +2*pi*self.echo_n_lob+pi/2, self.echo_n_points);
+                            half = cos(t) .* 2.^(-t/(2*pi*self.echo_lob_decay));
+                            if     obj.asymmetry  < 0.5
+                                idx = 1:round(self.echo_n_points*obj.asymmetry*2);
+                                y = [fliplr(half(idx)) half];
+                            elseif obj.asymmetry == 0.5
+                                y = [fliplr(half) half];
+                            elseif obj.asymmetry  > 0.5
+                                idx = 1:round(self.echo_n_points*(1-obj.asymmetry)*2);
+                                y = [fliplr(half) half(idx)];
+                            end
+                            
+                            x = linspace(obj.onset, obj.offset, length(y));
+                            plot( ax(a), ...
+                                x, ...
+                                y*obj.magnitude,...
+                                'Color',self.color_echo)
                         end
                         
                 end % switch

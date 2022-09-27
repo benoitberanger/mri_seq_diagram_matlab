@@ -70,6 +70,9 @@ G_ROpre.magnitude = -1;
 G_ROadc = DIAGRAM.add_gradient('G_ROadc');
 G_ROadc.set_type(mrisd.grad_type.readout);
 
+ECHO = DIAGRAM.add_echo('ECHO');
+ECHO.asymmetry = 0.25; % default = 0.5 (middle), range from 0 to 1
+
 
 %% Timings
 %
@@ -94,6 +97,7 @@ RF_180.set_middle_using_TE(RF_090.middle + TE/2); % this sets .middle, then the 
 
 ADC.duration = grad_dur;
 ADC.set_middle_using_TE(RF_090.middle + TE);
+ECHO.set_using_ADC(ADC);
 
 % Now place gradients
 
