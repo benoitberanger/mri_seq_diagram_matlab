@@ -8,8 +8,7 @@ clc
 pulse_dur = 1;
 grad_dur = 2;
 TE = 10; % this places ADC middle (and RF middle if needed)
-TR = 20;
-asymmetry = 0.25;
+TR = 15;
 
 
 %% Create the diagram object
@@ -78,6 +77,15 @@ ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
 annot_halfTE = DIAGRAM.add_annotation('TE/2');
 annot_TE     = DIAGRAM.add_annotation('TE'  );
 
+nextRF            = DIAGRAM.add_rf_pulse('nextRF');
+nextRF.flip_angle = RF_090.flip_angle;
+nextRF.magnitude  = RF_090.magnitude;
+
+nextGSS      = DIAGRAM.add_gradient('nextGSS');
+nextGSS.type = G_SS090set.type; % grad_type is an enumeration, use [TAB] for auto-completion
+
+annot_TR     = DIAGRAM.add_annotation('TR');
+
 
 %% Timings
 %
@@ -98,10 +106,10 @@ annot_TE     = DIAGRAM.add_annotation('TE'  );
 RF_090.set_as_initial_element(pulse_dur); % set duration(use input argument), .onset = 0, ...
 
 RF_180.duration = pulse_dur;
-RF_180.set_middle_using_TE(RF_090.middle + TE/2); % this sets .middle, then the rest (onset/offset/duration)
+RF_180.set_middle_using_TRTE(RF_090.middle + TE/2); % this sets .middle, then the rest (onset/offset/duration)
 
 ADC.duration = grad_dur;
-ADC.set_middle_using_TE(RF_090.middle + TE);
+ADC.set_middle_using_TRTE(RF_090.middle + TE);
 ECHO.set_using_ADC(ADC);
 
 % Now place gradients
@@ -122,6 +130,15 @@ G_ROpre.set_offset_at_elem_onset(G_ROadc);
 
 annot_halfTE.set_onset_and_duration(RF_090.middle, TE/2);
 annot_TE.    set_onset_and_duration(RF_090.middle, TE  );
+
+% for TR visualization : 
+
+nextRF.duration = RF_090.duration;
+nextRF.set_middle_using_TRTE(RF_090.middle + TR);
+
+nextGSS.set_flattop_on_rf(nextRF);
+
+annot_TR.set_onset_and_duration(RF_090.middle, TR);
 
 
 %% Now we draw

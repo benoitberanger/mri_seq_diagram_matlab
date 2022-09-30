@@ -8,8 +8,9 @@ classdef diagram < handle
         color_adc     = [0.5 0.5 0.5] % gray
         color_echo    = 'blue'
         
-        color_arrow   = [0.8 0.8 0.8] % light gray
-        color_vbar    = [0.8 0.8 0.8] % light gray
+        color_midline = [0.8 0.8 0.8] % light gray
+        color_arrow   = [0.9 0.9 0.9] % light gray
+        color_vbar    = [0.9 0.9 0.9] % light gray
         
         sinc_n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
         sinc_n_points = 100 % definition of the SINC (RF pulse)
@@ -137,6 +138,10 @@ classdef diagram < handle
                 % on a figure, (0,0) "origin" point is at bottom left corner
                 %                      x    y                      w    h
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.94 y_space*0.90];
+                
+                if ~strcmp( self.channel_type{a} , '' )
+                    plot(ax(a), [t_min t_max], [0 0], 'Color', self.color_midline)
+                end
                 
                 % seperate objects & plot curves
                 switch self.channel_type{a}
@@ -283,10 +288,6 @@ classdef diagram < handle
                         
                         
                 end % switch
-                
-                if ~strcmp( self.channel_type{a} , '' )
-                    plot(ax(a), [t_min t_max], [0 0], 'Color', 'black', 'Linewidth', 0.5, 'LineStyle', ':')
-                end
                 
                 % make visal ajusments so each axes looks cleaner
                 ax(a).YLabel.Interpreter = 'none';

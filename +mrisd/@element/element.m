@@ -73,10 +73,10 @@ classdef element < handle & matlab.mixin.Copyable
         end % function
         
         %------------------------------------------------------------------
-        function set_middle_using_TE(self, TE)
-            self.middle = TE;
-            self.onset  = TE - self.duration/2;
-            self.offset = TE + self.duration/2;
+        function set_middle_using_TRTE(self, TRTE)
+            self.middle = TRTE;
+            self.onset  = TRTE - self.duration/2;
+            self.offset = TRTE + self.duration/2;
         end
         
         %------------------------------------------------------------------
