@@ -80,6 +80,14 @@ classdef element < handle & matlab.mixin.Copyable
         end
         
         %------------------------------------------------------------------
+        function set_onset_and_duration(self, onset,duration)
+            self.onset    = onset;
+            self.duration = duration;
+            self.offset   = onset + duration;
+            self.middle   = onset + duration/2;
+        end
+        
+        %------------------------------------------------------------------
         function new = deepcopy(self, name)
             new = self.copy();
             if nargin > 1

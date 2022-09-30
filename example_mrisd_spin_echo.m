@@ -8,6 +8,8 @@ clc
 pulse_dur = 1;
 grad_dur = 2;
 TE = 10; % this places ADC middle (and RF middle if needed)
+TR = 20;
+asymmetry = 0.25;
 
 
 %% Create the diagram object
@@ -71,7 +73,10 @@ G_ROadc = DIAGRAM.add_gradient('G_ROadc');
 G_ROadc.set_type(mrisd.grad_type.readout);
 
 ECHO = DIAGRAM.add_echo('ECHO');
-ECHO.asymmetry = 0.25; % default = 0.5 (middle), range from 0 to 1
+ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
+
+annot_halfTE = DIAGRAM.add_annotation('TE/2');
+annot_TE     = DIAGRAM.add_annotation('TE'  );
 
 
 %% Timings
@@ -114,6 +119,9 @@ G_SS180set.set_flattop_on_rf(RF_180);
 G_ROadc.set_flattop_on_adc(ADC);
 G_ROpre.set_total_duration(ADC.duration/2);
 G_ROpre.set_offset_at_elem_onset(G_ROadc);
+
+annot_halfTE.set_onset_and_duration(RF_090.middle, TE/2);
+annot_TE.    set_onset_and_duration(RF_090.middle, TE  );
 
 
 %% Now we draw

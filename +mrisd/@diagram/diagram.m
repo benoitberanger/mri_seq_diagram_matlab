@@ -8,6 +8,9 @@ classdef diagram < handle
         color_adc     = [0.5 0.5 0.5] % gray
         color_echo    = 'blue'
         
+        color_arrow   = [0.8 0.8 0.8] % light gray
+        color_vbar    = [0.8 0.8 0.8] % light gray
+        
         sinc_n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
         sinc_n_points = 100 % definition of the SINC (RF pulse)
         
@@ -26,7 +29,7 @@ classdef diagram < handle
         fig
         ax
         
-        channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}
+        channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
         
     end % properties
     
@@ -62,6 +65,14 @@ classdef diagram < handle
                 name = '';
             end
             obj = self.add_element('mrisd.echo', name);
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_annotation(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj = self.add_element('mrisd.annotation', name);
         end % function
         
         %------------------------------------------------------------------
@@ -190,7 +201,7 @@ classdef diagram < handle
                             else
                                 y_arraow = -[ax(a).Position(2)+ax(a).Position(4) ax(a).Position(2)                  ]*obj.magnitude;
                             end
-                            annotation(self.fig,'arrow', [1 1]*(ax(a).Position(1) + (obj.onset-t_min)*ax(a).Position(3)/(t_max-t_min)), y_arraow)
+                            annotation(self.fig,'arrow', [1 1]*get_absolute_fig_pos_x(ax(a), obj.onset, t_min, t_max), y_arraow)
                         end
                         
                     case 'G_RO' %------------------------------------------
@@ -247,9 +258,35 @@ classdef diagram < handle
                                 'Color',self.color_echo)
                         end
                         
+                    case ''% annotations ----------------------------------
+                        
+                        is_obj = cellfun(@(x) isa(x,'mrisd.annotation'), self.element_array);
+                        where_obj = find(is_obj);
+                        where_obj = fliplr(where_obj);
+                        
+                        spacing = 1/(numel(where_obj)+1);
+                        
+                        for i = 1 : numel(where_obj)
+                            obj = self.element_array{where_obj(i)};
+                            
+                            x1 = get_absolute_fig_pos_x(ax(a), obj.onset , t_min, t_max);
+                            x2 = get_absolute_fig_pos_x(ax(a), obj.offset, t_min, t_max);
+                            y1 = ax(a).Position(2) + ax(a).Position(4)*spacing*i;
+                            y2 = y1;
+                            
+                            annotation(self.fig,'doublearrow', [x1 x2], [y1 y2],'Color',self.color_arrow)
+                            annotation(self.fig,'textbox', [x1+(x2-x1)/2 y1 0 0], 'String', obj.name,...
+                                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle')
+                            annotation(self.fig,'line', [x1 x1], [y1 1], 'LineStyle','-','Color',self.color_vbar)
+                            annotation(self.fig,'line', [x2 x2], [y1 1], 'LineStyle','-','Color',self.color_vbar)
+                        end
+                        
+                        
                 end % switch
                 
-                plot(ax(a), [t_min t_max], [0 0], 'Color', 'black', 'Linewidth', 0.5, 'LineStyle', ':')
+                if ~strcmp( self.channel_type{a} , '' )
+                    plot(ax(a), [t_min t_max], [0 0], 'Color', 'black', 'Linewidth', 0.5, 'LineStyle', ':')
+                end
                 
                 % make visal ajusments so each axes looks cleaner
                 ax(a).YLabel.Interpreter = 'none';
@@ -333,3 +370,8 @@ classdef diagram < handle
     end % methods
     
 end % classdef
+
+
+function x_fig = get_absolute_fig_pos_x(ax, x_ax, t_min, t_max)
+    x_fig = ax.Position(1) + (x_ax-t_min)*ax.Position(3)/(t_max-t_min);
+end
