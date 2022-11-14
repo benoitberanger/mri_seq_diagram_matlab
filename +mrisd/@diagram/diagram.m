@@ -281,7 +281,7 @@ classdef diagram < handle
                             
                             annotation(self.fig,'doublearrow', [x1 x2], [y1 y2],'Color',self.color_arrow)
                             annotation(self.fig,'textbox', [x1+(x2-x1)/2 y1 0 0], 'String', obj.name,...
-                                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle')
+                                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', 'Interpreter', 'none')
                             annotation(self.fig,'line', [x1 x1], [y1 1], 'LineStyle','-','Color',self.color_vbar)
                             annotation(self.fig,'line', [x2 x2], [y1 1], 'LineStyle','-','Color',self.color_vbar)
                         end
