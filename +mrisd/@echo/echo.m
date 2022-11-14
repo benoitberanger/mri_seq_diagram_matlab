@@ -1,7 +1,9 @@
 classdef echo < mrisd.element
     
     properties (SetAccess = public)
-        asymmetry double
+        
+        asymmetry double = 0.5 % from 0 to 1, with 0.5 is symetric echo
+        
     end % properties
     
     methods (Access = public)
@@ -11,18 +13,6 @@ classdef echo < mrisd.element
             self.onset    = ADC.onset;
             self.middle   = ADC.middle;
             self.offset   = ADC.offset;
-        end
-        
-    end % methods
-    
-    methods % set methods, so the user can use which ever syntax he prefer
-        
-        % asymmetry
-        function set_asymmetry(self, asymmetry)
-            self.asymmetry = asymmetry; % this calls the set method just bellow
-        end
-        function set.asymmetry(self, asymmetry)
-            self.asymmetry = asymmetry;
         end
         
     end % methods

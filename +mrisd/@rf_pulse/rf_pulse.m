@@ -16,17 +16,4 @@ classdef rf_pulse < mrisd.element
         
     end % methods
     
-    
-    methods % set methods, so the user can use which ever syntax he prefer
-        
-        % flip_angle
-        function set_flip_angle(self, flip_angle)
-            self.flip_angle = flip_angle; % this calls the set method just bellow
-        end
-        function set.flip_angle(self, flip_angle)
-            self.flip_angle = flip_angle;
-        end
-        
-    end % methods
-    
 end % classdef

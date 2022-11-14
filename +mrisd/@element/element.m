@@ -2,16 +2,15 @@ classdef element < handle & matlab.mixin.Copyable
     
     properties (SetAccess = public)
         
+        % the "name" of the object is used for the diagram.plot()
         name       char
         
-        % time stuff
-        
-        %- for plot
+        % for plot
         onset      double
         middle     double
         offset     double
         
-        %- element duration( arbitrary unit )
+        % element duration( arbitrary unit )
         duration   double
         
         % visual stuff
@@ -93,60 +92,6 @@ classdef element < handle & matlab.mixin.Copyable
             if nargin > 1
                 new.name = name;
             end
-        end
-        
-    end % methods
-    
-    
-    methods % set methods, so the user can use which ever syntax he prefer
-        
-        % name
-        function set_name(self, name)
-            self.name = name; % this calls the set method just bellow
-        end
-        function set.name(self, name)
-            self.name = name;
-        end
-        
-        % duration
-        function set_duration(self, duration)
-            self.duration = duration; % this calls the set method just bellow
-        end
-        function set.duration(self, duration)
-            self.duration = duration;
-        end
-        
-        % onset
-        function set_onset(self, onset)
-            self.onset = onset; % this calls the set method just bellow
-        end
-        function set.onset(self, onset)
-            self.onset = onset;
-        end
-        
-        % middle
-        function set_middle(self, middle)
-            self.middle = middle; % this calls the set method just bellow
-        end
-        function set.middle(self, middle)
-            self.middle = middle;
-        end
-        
-        % offset
-        function set_offset(self, offset)
-            self.offset = offset; % this calls the set method just bellow
-        end
-        function set.offset(self, offset)
-            self.offset = offset;
-        end
-        
-        % magnitude
-        function set_magnitude(self, magnitude)
-            self.magnitude = magnitude; % this calls the set method just bellow
-        end
-        function set.magnitude(self, magnitude)
-            % assert(isnumeric(magnitude) && isscalar(magnitude) && magnitude>=-1 && magnitude<=+1, '%s.magnitude muse be a [-1 .. +1]', self.name)
-            self.magnitude = magnitude;
         end
         
     end % methods

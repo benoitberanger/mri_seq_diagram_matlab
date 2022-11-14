@@ -6,7 +6,4 @@ classdef annotation < mrisd.element
     methods (Access = public)
     end % methods
     
-    methods % set methods, so the user can use which ever syntax he prefer
-    end % methods
-    
 end % classdef

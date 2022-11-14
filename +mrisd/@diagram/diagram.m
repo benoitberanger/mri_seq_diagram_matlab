@@ -310,66 +310,6 @@ classdef diagram < handle
     end % methods
     
     
-    methods % set methods, so the user can use which ever syntax he prefer
-        
-        % color_rf
-        function set_color_rf(self, color_rf)
-            self.color_rf = color_rf; % this calls the set method just bellow
-        end
-        function set.color_rf(self, color_rf)
-            self.color_rf = color_rf;
-        end
-        
-        % color_grad_ss
-        function set_color_grad_ss(self, color_grad_ss)
-            self.color_grad_ss = color_grad_ss; % this calls the set method just bellow
-        end
-        function set.color_grad_ss(self, color_grad_ss)
-            self.color_grad_ss = color_grad_ss;
-        end
-        
-        % color_grad_ro
-        function set_color_grad_ro(self, color_grad_ro)
-            self.color_grad_ro = color_grad_ro; % this calls the set method just bellow
-        end
-        function set.color_grad_ro(self, color_grad_ro)
-            self.color_grad_ro = color_grad_ro;
-        end
-        
-        % color_adc
-        function set_color_adc(self, color_adc)
-            self.color_adc = color_adc; % this calls the set method just bellow
-        end
-        function set.color_adc(self, color_adc)
-            self.color_adc = color_adc;
-        end
-        
-        % sinc_n_lob
-        function set_sinc_n_lob(self, sinc_n_lob)
-            self.sinc_n_lob = sinc_n_lob; % this calls the set method just bellow
-        end
-        function set.sinc_n_lob(self, sinc_n_lob)
-            self.sinc_n_lob = sinc_n_lob;
-        end
-        
-         % sinc_n_points
-        function set_sinc_n_points(self, sinc_n_points)
-            self.sinc_n_points = sinc_n_points; % this calls the set method just bellow
-        end
-        function set.sinc_n_points(self, sinc_n_points)
-            self.sinc_n_points = sinc_n_points;
-        end
-        
-        % pe_n_lines
-        function set_pe_n_lines(self, pe_n_lines)
-            self.pe_n_lines = pe_n_lines; % this calls the set method just bellow
-        end
-        function set.pe_n_lines(self, pe_n_lines)
-            self.pe_n_lines = pe_n_lines;
-        end
-        
-    end % methods
-    
 end % classdef
 
 

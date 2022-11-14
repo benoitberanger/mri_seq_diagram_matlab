@@ -25,13 +25,6 @@ DIAGRAM = mrisd.diagram();
 
 
 %% Create each graphic element and set their paramters except position in time
-% !! IMPORTANT !! All objects properties can be accessed with 2 syntax :
-%   obj.<propertie> = value
-%   obj.set_<propertie>(value)
-%
-% Use the syntax you prefer
-% In this example, all syntaxs will be used, just as showcase
-%
 
 % Create RF excitation
 RF_090            = DIAGRAM.add_rf_pulse('RF_090');
@@ -40,7 +33,7 @@ RF_090.magnitude  = 0.5; % half the magnitude(1) because there will be a 180° p
 
 % Create RF refocusing
 RF_180 = DIAGRAM.add_rf_pulse('RF_180');
-RF_180.set_flip_angle(180);
+RF_180.flip_angle = 180;
 
 % Create ADC
 ADC = DIAGRAM.add_adc('ADC');
@@ -50,17 +43,17 @@ G_SS090set      = DIAGRAM.add_gradient('G_SS090set');
 G_SS090set.type = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
 
 % Create SliceSelective Gradient "rewinder"
-G_SS090rew = DIAGRAM.add_gradient('G_SS090rew');
-G_SS090rew.set_type_slice_selection();
-G_SS090rew.set_magnitude(-1);
+G_SS090rew           = DIAGRAM.add_gradient('G_SS090rew');
+G_SS090rew.type      = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
+G_SS090rew.magnitude = -1;
 
 % Create PhaseEncoding Gradient "setter"
 G_PEset      = DIAGRAM.add_gradient('G_PEset');
 G_PEset.type = mrisd.grad_type.phase_encoding;
 
 % Create SliceRefocussing Gradient "setter"
-G_SS180set = DIAGRAM.add_gradient('G_SS180set');
-G_SS180set.set_type(mrisd.grad_type.slice_selection); % grad_type is an enumeration, use [TAB] for auto-completion
+G_SS180set      = DIAGRAM.add_gradient('G_SS180set');
+G_SS180set.type = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
 
 % Create ReadOut gradient "prephase"
 G_ROpre           = DIAGRAM.add_gradient('G_ROpre');
@@ -68,10 +61,10 @@ G_ROpre.type      = mrisd.grad_type.readout;
 G_ROpre.magnitude = -1;
 
 % Create ReadOut gradient for ADC
-G_ROadc = DIAGRAM.add_gradient('G_ROadc');
-G_ROadc.set_type(mrisd.grad_type.readout);
+G_ROadc      = DIAGRAM.add_gradient('G_ROadc');
+G_ROadc.type = mrisd.grad_type.readout;
 
-ECHO = DIAGRAM.add_echo('ECHO');
+ECHO           = DIAGRAM.add_echo('ECHO');
 ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
 
 annot_halfTE = DIAGRAM.add_annotation('TE/2');
