@@ -8,9 +8,9 @@ classdef diagram < handle
         color_adc     = [0.5 0.5 0.5] % gray
         color_echo    = 'blue'
         
-        color_midline = [0.8 0.8 0.8] % light gray
-        color_arrow   = [0.9 0.9 0.9] % light gray
-        color_vbar    = [0.9 0.9 0.9] % light gray
+        color_midline = [0.8 0.8 0.8] % lighter gray
+        color_arrow   = [0.9 0.9 0.9] % light   gray
+        color_vbar    = [0.9 0.9 0.9] % light   gray
         
         sinc_n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
         sinc_n_points = 100 % definition of the SINC (RF pulse)
@@ -25,10 +25,11 @@ classdef diagram < handle
     
     properties( SetAccess = protected )
         
-        element_array = {}
+        element_array = {} % adc, gradient, echo ...
+        block_array   = {} % epi block
         
-        fig
-        ax
+        fig % pointer to the figure
+        ax  % pointer to the axes array
         
         channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
         
@@ -45,11 +46,38 @@ classdef diagram < handle
         end % function
         
         %------------------------------------------------------------------
-        function obj = add_gradient(self, name)
+        
+        function obj = add_gradient_slice_selection(self, name)
             if nargin < 2
                 name = '';
             end
-            obj = self.add_element('mrisd.gradient', name);
+            obj      = self.add_element('mrisd.gradient', name);
+            obj.type = mrisd.grad_type.slice_selection;
+        end % function
+        
+        function obj = add_gradient_phase_encoding(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj      = self.add_element('mrisd.gradient', name);
+            obj.type = mrisd.grad_type.phase_encoding;
+        end % function
+        
+        function obj = add_gradient_readout(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj      = self.add_element('mrisd.gradient', name);
+            obj.type = mrisd.grad_type.readout;
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_block_epi(self, name)
+            if nargin < 2
+                name = '';
+            end
+            obj      = self.add_block('mrisd.block', name);
+            obj.type = mrisd.block_type.epi;
         end % function
         
         %------------------------------------------------------------------
@@ -84,7 +112,6 @@ classdef diagram < handle
             self.store_element(obj);
         end % function
         
-        %------------------------------------------------------------------
         function store_element(self, element_array)
             if iscell(element_array)
                 for i = 1 : numel(element_array)
@@ -93,6 +120,26 @@ classdef diagram < handle
                 end
             else
                 self.element_array{end+1} = element_array;
+            end
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_block(self, type, name)
+            obj         = feval(type);
+            obj.name    = name;
+            obj.diagram = self;
+            self.store_block(obj);
+            self.store_element(obj.element_array),
+        end % function
+        
+        function store_block(self, block_array)
+            if iscell(block_array)
+                for i = 1 : numel(block_array)
+                    self.block_array{end+1} = block_array{i};
+                    block_array{i}.diagram = self; % copy a pointer
+                end
+            else
+                self.block_array{end+1} = block_array;
             end
         end % function
         

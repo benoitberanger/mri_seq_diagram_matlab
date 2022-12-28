@@ -1,4 +1,4 @@
-classdef element < handle & matlab.mixin.Copyable
+classdef element < handle
     
     properties (SetAccess = public)
         
@@ -25,6 +25,7 @@ classdef element < handle & matlab.mixin.Copyable
     methods (Access = public)
         
         %------------------------------------------------------------------
+        % CONSTRUCTOR
         function self = element( name )
             if nargin < 1
                 return
