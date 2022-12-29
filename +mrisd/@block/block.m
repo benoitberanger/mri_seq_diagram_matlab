@@ -2,24 +2,8 @@ classdef block < mrisd.element
     
     properties (SetAccess = public)
         
-        %         % the "name" of the object is used for the diagram.plot()
-        %         name       char
-        %
-        type       char % use mrisd.block_type.[TAB] // controlled by a setter method
-        %
-        %         % for plot
-        %         onset      double
-        %         middle     double
-        %         offset     double
-        %
-        %         % element duration( arbitrary unit )
-        %         duration   double
-        %
-        %         % visual stuff
-        %         magnitude  double = 1 % like a scaling factor
-        %
-        %         % pointer
-        %         diagram    mrisd.diagram
+        type  char   % use mrisd.block_type.[TAB] // controlled by a setter method
+        color = struct % need to overload it (since its abstract)
         
     end % properties
     

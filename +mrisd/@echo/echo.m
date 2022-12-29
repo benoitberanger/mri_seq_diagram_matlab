@@ -4,6 +4,12 @@ classdef echo < mrisd.element
         
         asymmetry double = 0.5 % from 0 to 1, with 0.5 is symetric echo
         
+        % visual
+        color     = 'blue'
+        n_lob     = 10;  % integer values, { 0 (no lob), 1, 2, 3, ...}
+        n_points  = 1000 % definition of the sin wave with exponential envelope
+        lob_decay = 2;   % lob number with half the height
+        
     end % properties
     
     methods (Access = public)

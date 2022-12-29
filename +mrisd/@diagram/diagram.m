@@ -2,24 +2,7 @@ classdef diagram < handle
     
     properties( SetAccess = public )
         
-        color_rf      = 'red'
-        color_grad_ss = 'black'
-        color_grad_ro = 'black'
-        color_adc     = [0.5 0.5 0.5] % gray
-        color_echo    = 'blue'
-        
-        color_midline = [0.8 0.8 0.8] % lighter gray
-        color_arrow   = [0.9 0.9 0.9] % light   gray
-        color_vbar    = [0.9 0.9 0.9] % light   gray
-        
-        sinc_n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
-        sinc_n_points = 100 % definition of the SINC (RF pulse)
-        
-        pe_n_lines    = 5
-        
-        echo_n_lob    = 10;  % integer values, { 0 (no lob), 1, 2, 3, ...}
-        echo_n_points = 1000 % definition of the sin wave with exponential envelope
-        echo_lob_decay= 2;   % lob number with half the height
+        color_midline = [0.8 0.8 0.8] % light gray
         
     end % properties
     
@@ -201,13 +184,13 @@ classdef diagram < handle
                         
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
-                            t = linspace(-(2*self.sinc_n_lob+1), +(2*self.sinc_n_lob+1), self.sinc_n_points);
+                            t = linspace(-(2*obj.n_lob+1), +(2*obj.n_lob+1), obj.n_points);
                             y = sinc( t );
-                            x = linspace(obj.onset, obj.offset, self.sinc_n_points);
+                            x = linspace(obj.onset, obj.offset,obj.n_points);
                             plot( ax(a), ...
                                 x, ...
                                 y*obj.magnitude,...
-                                'Color',self.color_rf)
+                                'Color',obj.color)
                         end
                         
                     case 'G_SS' %------------------------------------------
@@ -221,7 +204,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
                                 [0          obj.magnitude              obj.magnitude                              0          ], ...
-                                'Color',self.color_grad_ss)
+                                'Color',obj.color)
                         end
                         
                     case 'G_PE' %------------------------------------------
@@ -234,18 +217,18 @@ classdef diagram < handle
                             obj = self.element_array{where_obj(i)};
                             
                             % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
-                            colors = jet(2*self.pe_n_lines+1);
+                            colors = jet(2*obj.pe_n_lines+1);
                             
                             if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
                                 colors = flipud(colors);
                             end
                             
                             count = 0;
-                            for line = -self.pe_n_lines : self.pe_n_lines
+                            for line = -obj.pe_n_lines : obj.pe_n_lines
                                 count = count + 1;
                                 plot( ax(a), ...
                                     [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
-                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/self.pe_n_lines), ...
+                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.pe_n_lines), ...
                                     'Color',colors(count,:))
                             end                            
                             if sign(obj.magnitude) == 1
@@ -267,7 +250,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
                                 [0          obj.magnitude              obj.magnitude                              0         ], ...
-                                'Color',self.color_grad_ro)
+                                'Color',obj.color)
                         end
                         
                     case 'ADC' %-------------------------------------------
@@ -281,7 +264,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 [obj.onset obj.onset     obj.offset     obj.offset], ...
                                 [0         obj.magnitude obj.magnitude  0         ], ...
-                                'Color',self.color_adc)
+                                'Color',obj.color)
                         end
                         
                         % Echo
@@ -291,15 +274,15 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             
-                            t = linspace(0, +2*pi*self.echo_n_lob+pi/2, self.echo_n_points);
-                            half = cos(t) .* 2.^(-t/(2*pi*self.echo_lob_decay));
+                            t = linspace(0, +2*pi*obj.n_lob+pi/2, obj.n_points);
+                            half = cos(t) .* 2.^(-t/(2*pi*obj.lob_decay));
                             if     obj.asymmetry  < 0.5
-                                idx = 1:round(self.echo_n_points*obj.asymmetry*2);
+                                idx = 1:round(obj.n_points*obj.asymmetry*2);
                                 y = [fliplr(half(idx)) half];
                             elseif obj.asymmetry == 0.5
                                 y = [fliplr(half) half];
                             elseif obj.asymmetry  > 0.5
-                                idx = 1:round(self.echo_n_points*(1-obj.asymmetry)*2);
+                                idx = 1:round(obj.n_points*(1-obj.asymmetry)*2);
                                 y = [fliplr(half) half(idx)];
                             end
                             
@@ -307,7 +290,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 x, ...
                                 y*obj.magnitude,...
-                                'Color',self.color_echo)
+                                'Color',obj.color)
                         end
                         
                     case ''% annotations ----------------------------------
@@ -326,11 +309,11 @@ classdef diagram < handle
                             y1 = ax(a).Position(2) + ax(a).Position(4)*spacing*i;
                             y2 = y1;
                             
-                            annotation(self.fig,'doublearrow', [x1 x2], [y1 y2],'Color',self.color_arrow)
+                            annotation(self.fig,'doublearrow', [x1 x2], [y1 y2],'Color',obj.color.arrow)
                             annotation(self.fig,'textbox', [x1+(x2-x1)/2 y1 0 0], 'String', obj.name,...
                                 'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', 'Interpreter', 'none')
-                            annotation(self.fig,'line', [x1 x1], [y1 1], 'LineStyle','-','Color',self.color_vbar)
-                            annotation(self.fig,'line', [x2 x2], [y1 1], 'LineStyle','-','Color',self.color_vbar)
+                            annotation(self.fig,'line', [x1 x1], [y1 1], 'LineStyle','-','Color',obj.color.vbar)
+                            annotation(self.fig,'line', [x2 x2], [y1 1], 'LineStyle','-','Color',obj.color.vbar)
                         end
                         
                         

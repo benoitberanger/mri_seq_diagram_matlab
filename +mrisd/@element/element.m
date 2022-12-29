@@ -22,6 +22,13 @@ classdef element < handle
     end % properties
     
     
+    properties (Abstract)
+        
+        color
+        
+    end % properties
+    
+    
     methods (Access = public)
         
         %------------------------------------------------------------------
