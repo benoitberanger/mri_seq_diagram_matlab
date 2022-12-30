@@ -7,7 +7,8 @@ clc
 % motsly for time axis scaling
 pulse_dur = 1;
 grad_dur = 2;
-TE = 10; % this places ADC middle (and RF middle if needed)
+epi_block_duration = 10;
+TE = 8;
 TR = 15;
 
 
@@ -75,9 +76,13 @@ G_SSset.set_flattop_on_rf(RF_alpha); % will set all timings
 G_SSrew.set_total_duration(RF_alpha.duration/2); % will set all .dur*, but no .onset or .offset
 G_SSrew.set_onset_at_elem_offset(G_SSset);
 
+block_EPI.duration = epi_block_duration;
+block_EPI.set_middle_using_TRTE(RF_alpha.middle + TE);
+block_EPI.update_block_elements();
+
 annot_TE.set_onset_and_duration(RF_alpha.middle, TE  );
 
-% for TR visualization : 
+% for TR visualization :
 
 nextRF.duration = RF_alpha.duration;
 nextRF.set_middle_using_TRTE(RF_alpha.middle + TR);

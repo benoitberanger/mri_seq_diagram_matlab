@@ -22,68 +22,44 @@ classdef diagram < handle
         
         %------------------------------------------------------------------
         function obj = add_rf_pulse(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj = self.add_element('mrisd.rf_pulse', name);
         end % function
         
         %------------------------------------------------------------------
         
         function obj = add_gradient_slice_selection(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.slice_selection;
         end % function
         
         function obj = add_gradient_phase_encoding(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.phase_encoding;
         end % function
         
         function obj = add_gradient_readout(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.readout;
         end % function
         
         %------------------------------------------------------------------
         function obj = add_block_epi(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj      = self.add_block('mrisd.block', name);
             obj.type = mrisd.block_type.epi;
         end % function
         
         %------------------------------------------------------------------
         function obj = add_adc(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj = self.add_element('mrisd.adc', name);
         end % function
         
         %------------------------------------------------------------------
         function obj = add_echo(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj = self.add_element('mrisd.echo', name);
         end % function
         
         %------------------------------------------------------------------
         function obj = add_annotation(self, name)
-            if nargin < 2
-                name = '';
-            end
             obj = self.add_element('mrisd.annotation', name);
         end % function
         
@@ -216,27 +192,37 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             
-                            % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
-                            colors = jet(2*obj.pe_n_lines+1);
-                            
-                            if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
-                                colors = flipud(colors);
-                            end
-                            
-                            count = 0;
-                            for line = -obj.pe_n_lines : obj.pe_n_lines
-                                count = count + 1;
-                                plot( ax(a), ...
-                                    [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
-                                    [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.pe_n_lines), ...
-                                    'Color',colors(count,:))
-                            end                            
-                            if sign(obj.magnitude) == 1
-                                y_arraow = +[ax(a).Position(2)                   ax(a).Position(2)+ax(a).Position(4)]*obj.magnitude;
+                            if obj.pe_n_lines > 1
+                                
+                                % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
+                                colors = jet(2*obj.pe_n_lines+1);
+                                
+                                if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
+                                    colors = flipud(colors);
+                                end
+                                
+                                count = 0;
+                                for line = -obj.pe_n_lines : obj.pe_n_lines
+                                    count = count + 1;
+                                    plot( ax(a), ...
+                                        [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
+                                        [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.pe_n_lines), ...
+                                        'Color',colors(count,:))
+                                end
+                                if sign(obj.magnitude) == 1
+                                    y_arraow = +[ax(a).Position(2)                   ax(a).Position(2)+ax(a).Position(4)]*obj.magnitude;
+                                else
+                                    y_arraow = -[ax(a).Position(2)+ax(a).Position(4) ax(a).Position(2)                  ]*obj.magnitude;
+                                end
+                                annotation(self.fig,'arrow', [1 1]*get_absolute_fig_pos_x(ax(a), obj.onset, t_min, t_max), y_arraow)
                             else
-                                y_arraow = -[ax(a).Position(2)+ax(a).Position(4) ax(a).Position(2)                  ]*obj.magnitude;
+                                
+                                plot( ax(a), ...
+                                    [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
+                                    [0          obj.magnitude              obj.magnitude                              0         ], ...
+                                    'Color',obj.color)
+                                
                             end
-                            annotation(self.fig,'arrow', [1 1]*get_absolute_fig_pos_x(ax(a), obj.onset, t_min, t_max), y_arraow)
                         end
                         
                     case 'G_RO' %------------------------------------------

@@ -1,16 +1,14 @@
-classdef element < handle
+classdef (Abstract) element < handle
     
     properties (SetAccess = public)
         
         % the "name" of the object is used for the diagram.plot()
         name       char
         
-        % for plot
+        % element duration( arbitrary unit )
         onset      double
         middle     double
         offset     double
-        
-        % element duration( arbitrary unit )
         duration   double
         
         % visual stuff
@@ -30,15 +28,6 @@ classdef element < handle
     
     
     methods (Access = public)
-        
-        %------------------------------------------------------------------
-        % CONSTRUCTOR
-        function self = element( name )
-            if nargin < 1
-                return
-            end
-            self.name = name;
-        end % function
         
         %------------------------------------------------------------------
         function set_as_initial_element( self, duration )
