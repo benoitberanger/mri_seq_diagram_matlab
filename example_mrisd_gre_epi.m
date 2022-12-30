@@ -16,8 +16,6 @@ TR = 15;
 % "channel" types are {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}. Each channe is one curve container.
 %
 % Gradients are seperated into "logical" axis : slice selective, phase encoding, readout
-% This seperation is done by filling .type, using an enumeration. Don't worry, its makes useful and very simple tu use.
-%
 
 % Create diagram object
 % This object will contain all the information
@@ -29,10 +27,10 @@ DIAGRAM = mrisd.diagram();
 
 % Create RF excitation
 RF_alpha            = DIAGRAM.add_rf_pulse('RF_alpha');
-RF_alpha.magnitude  = 1; % half the magnitude(1) because there will be a 180° pulse
+RF_alpha.magnitude  = 1;
 
 % Create SliceSelective Gradient "setter"
-G_SSset      = DIAGRAM.add_gradient_slice_selection('G_SSset');
+G_SSset = DIAGRAM.add_gradient_slice_selection('G_SSset');
 
 % Create SliceSelective Gradient "rewinder"
 G_SSrew           = DIAGRAM.add_gradient_slice_selection('G_SSrew');
@@ -40,6 +38,8 @@ G_SSrew.magnitude = -1;
 
 % Create EPI block
 block_EPI = DIAGRAM.add_block_epi('block_EPI');
+block_EPI.epi.n_pe = 11; % number of phase encoding steps (lines)
+block_EPI.generate_epi_block();
 
 nextRF            = DIAGRAM.add_rf_pulse('nextRF');
 nextRF.flip_angle = RF_alpha.flip_angle;
@@ -78,9 +78,9 @@ G_SSrew.set_onset_at_elem_offset(G_SSset);
 
 block_EPI.duration = epi_block_duration;
 block_EPI.set_middle_using_TRTE(RF_alpha.middle + TE);
-block_EPI.update_block_elements();
+block_EPI.update_block_elements(); % blocks contains many elements, this method will compute timings in all of them
 
-annot_TE.set_onset_and_duration(RF_alpha.middle, TE  );
+annot_TE.set_onset_and_duration(RF_alpha.middle, TE);
 
 % for TR visualization :
 

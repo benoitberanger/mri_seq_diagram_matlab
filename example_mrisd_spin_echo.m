@@ -15,8 +15,6 @@ TR = 15;
 % "channel" types are {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}. Each channe is one curve container.
 %
 % Gradients are seperated into "logical" axis : slice selective, phase encoding, readout
-% This seperation is done by filling .type, using an enumeration. Don't worry, its makes useful and very simple tu use.
-%
 
 % Create diagram object
 % This object will contain all the information
@@ -117,7 +115,7 @@ G_ROpre.set_offset_at_elem_onset(G_ROadc);
 annot_halfTE.set_onset_and_duration(RF_090.middle, TE/2);
 annot_TE.    set_onset_and_duration(RF_090.middle, TE  );
 
-% for TR visualization : 
+% for TR visualization :
 
 nextRF.duration = RF_090.duration;
 nextRF.set_middle_using_TRTE(RF_090.middle + TR);

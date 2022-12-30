@@ -36,7 +36,6 @@ classdef block < mrisd.element
             switch value
                 case mrisd.block_type.epi
                     self.type = value;
-                    self.generate_epi_block();
                 otherwise
                     error('block %s does not exist', value)
             end % switch
@@ -44,7 +43,7 @@ classdef block < mrisd.element
         
     end % methods
     
-    methods (Access = protected)
+    methods (Access = public)
         
         %------------------------------------------------------------------
         % block functions : epi
@@ -71,11 +70,11 @@ classdef block < mrisd.element
             
             % prepare magnitude of Echos
             if mod(self.epi.n_pe,2) == 0 % even
-                magnitude_L = 1 :  self.epi.n_pe   /2;
+                magnitude_L = 1 :  self.epi.n_pe/2;
                 magnitude = [magnitude_L fliplr(magnitude_L)] / max(magnitude_L);
             else % odd
                 magnitude_L = 1 : (self.epi.n_pe-1)/2;
-                magnitude = [magnitude_L self.epi.n_pe fliplr(magnitude_L)] / self.epi.n_pe;
+                magnitude = [magnitude_L magnitude_L(end)+1 fliplr(magnitude_L)] / (magnitude_L(end)+1);
             end
             
             % ADC & Echos
@@ -114,13 +113,16 @@ classdef block < mrisd.element
             RO_pre.set_offset_at_elem_onset(self.get_elem('G_blockEPI_RO_1'));
             
             PE_pre = self.get_elem('G_blockEPI_PEpre');
-            PE_pre.set_total_duration(duration_RO);
+            PE_pre.set_total_duration((PE_i.duration * self.epi.n_pe)/2);
             PE_pre.set_offset_at_elem_onset(self.get_elem('G_blockEPI_PE_1'));
             PE_pre.color = 'black';
             PE_pre.pe_n_lines = 1;
             
         end % function
         
+    end % methods
+    
+    methods (Access = protected)
         
         %------------------------------------------------------------------
         % commun methods
@@ -153,7 +155,7 @@ classdef block < mrisd.element
         end % function
         
         function obj = get_elem(self, name)
-            names = cellfun(@(x) x.name, self.element_array, 'UniformOutput', 0);
+            names = cellfun(@(x) x.name, self.element_array, 'UniformOutput', 0)';
             idx = strcmp(names, name);
             obj = self.element_array{idx};
         end
