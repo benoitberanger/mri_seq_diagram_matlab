@@ -3,6 +3,7 @@ classdef diagram < handle
     properties( SetAccess = public )
         
         color_midline = [0.8 0.8 0.8] % light gray
+        name char
         
     end % properties
     
@@ -21,22 +22,27 @@ classdef diagram < handle
     methods (Access = public)
         
         %------------------------------------------------------------------
+        % constructor
+        function self = diagram(name)
+            if nargin > 0
+                self.name = name;
+            end
+        end % function
+        
+        %------------------------------------------------------------------
         function obj = add_rf_pulse(self, name)
             obj = self.add_element('mrisd.rf_pulse', name);
         end % function
         
         %------------------------------------------------------------------
-        
         function obj = add_gradient_slice_selection(self, name)
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.slice_selection;
         end % function
-        
         function obj = add_gradient_phase_encoding(self, name)
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.phase_encoding;
         end % function
-        
         function obj = add_gradient_readout(self, name)
             obj      = self.add_element('mrisd.gradient', name);
             obj.type = mrisd.grad_type.readout;
@@ -64,45 +70,6 @@ classdef diagram < handle
         end % function
         
         %------------------------------------------------------------------
-        function obj = add_element(self, type, name)
-            obj         = feval(type);
-            obj.name    = name;
-            obj.diagram = self;
-            self.store_element(obj);
-        end % function
-        
-        function store_element(self, element_array)
-            if iscell(element_array)
-                for i = 1 : numel(element_array)
-                    self.element_array{end+1} = element_array{i};
-                    element_array{i}.diagram = self; % copy a pointer
-                end
-            else
-                self.element_array{end+1} = element_array;
-            end
-        end % function
-        
-        %------------------------------------------------------------------
-        function obj = add_block(self, type, name)
-            obj         = feval(type);
-            obj.name    = name;
-            obj.diagram = self;
-            self.store_block(obj);
-            self.store_element(obj.element_array),
-        end % function
-        
-        function store_block(self, block_array)
-            if iscell(block_array)
-                for i = 1 : numel(block_array)
-                    self.block_array{end+1} = block_array{i};
-                    block_array{i}.diagram = self; % copy a pointer
-                end
-            else
-                self.block_array{end+1} = block_array;
-            end
-        end % function
-        
-        %------------------------------------------------------------------
         function Draw( self )
             
             % checks
@@ -127,7 +94,11 @@ classdef diagram < handle
             end
             
             % open fig
-            self.fig = figure();
+            if ~isempty(self.name)
+                self.fig = figure('Name',self.name,'NumberTitle','off');
+            else
+                self.fig = figure();
+            end
             self.fig.Color = [1 1 1]; % white background
             
             nChan = length(self.channel_type);
@@ -323,8 +294,54 @@ classdef diagram < handle
             
         end % function
         
+        function save_fig(self, filename)
+            saveas(self.fig, filename)
+        end % function
+        
     end % methods
     
+    methods (Access = {?mrisd.block})
+        
+        %------------------------------------------------------------------
+        function obj = add_element(self, type, name)
+            obj         = feval(type);
+            obj.name    = name;
+            obj.diagram = self;
+            self.store_element(obj);
+        end % function
+        
+        function store_element(self, element_array)
+            if iscell(element_array)
+                for i = 1 : numel(element_array)
+                    self.element_array{end+1} = element_array{i};
+                    element_array{i}.diagram = self; % copy a pointer
+                end
+            else
+                self.element_array{end+1} = element_array;
+            end
+        end % function
+        
+        %------------------------------------------------------------------
+        function obj = add_block(self, type, name)
+            obj         = feval(type);
+            obj.name    = name;
+            obj.diagram = self;
+            self.store_block(obj);
+            self.store_element(obj.element_array),
+        end % function
+        
+        function store_block(self, block_array)
+            if iscell(block_array)
+                for i = 1 : numel(block_array)
+                    self.block_array{end+1} = block_array{i};
+                    block_array{i}.diagram = self; % copy a pointer
+                end
+            else
+                self.block_array{end+1} = block_array;
+            end
+        end % function
+        
+    end % methods
     
 end % classdef
 

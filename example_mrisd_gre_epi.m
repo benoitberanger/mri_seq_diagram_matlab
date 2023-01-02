@@ -20,7 +20,7 @@ TR = 15;
 % Create diagram object
 % This object will contain all the information
 % All rf, gradient, adc objects are also objects, contained in a diagram
-DIAGRAM = mrisd.diagram();
+DIAGRAM = mrisd.diagram('gre_epi');
 
 
 %% Create each graphic element and set their paramters except position in time
@@ -97,3 +97,6 @@ annot_TR.set_onset_and_duration(RF_alpha.middle, TR);
 
 DIAGRAM.Draw();
 
+% save the fig :
+% DIAGRAM.save_fig('gre_epi.png')
+% DIAGRAM.save_fig('gre_epi.svg')

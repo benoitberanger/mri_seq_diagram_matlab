@@ -3,6 +3,11 @@
 *.m~
 *.fig
 *.mat
+*.png
+*.svg
+*.bmp
+*.jpg
+*.jpeg
 
 # specific
 /test
