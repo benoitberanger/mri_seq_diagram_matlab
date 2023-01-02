@@ -1,16 +1,14 @@
-classdef element < handle & matlab.mixin.Copyable
+classdef (Abstract) element < handle
     
     properties (SetAccess = public)
         
         % the "name" of the object is used for the diagram.plot()
         name       char
         
-        % for plot
+        % element duration( arbitrary unit )
         onset      double
         middle     double
         offset     double
-        
-        % element duration( arbitrary unit )
         duration   double
         
         % visual stuff
@@ -22,15 +20,14 @@ classdef element < handle & matlab.mixin.Copyable
     end % properties
     
     
-    methods (Access = public)
+    properties (Abstract)
         
-        %------------------------------------------------------------------
-        function self = element( name )
-            if nargin < 1
-                return
-            end
-            self.name = name;
-        end % function
+        color
+        
+    end % properties
+    
+    
+    methods (Access = public)
         
         %------------------------------------------------------------------
         function set_as_initial_element( self, duration )

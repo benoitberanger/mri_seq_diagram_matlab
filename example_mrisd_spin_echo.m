@@ -15,8 +15,6 @@ TR = 15;
 % "channel" types are {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC'}. Each channe is one curve container.
 %
 % Gradients are seperated into "logical" axis : slice selective, phase encoding, readout
-% This seperation is done by filling .type, using an enumeration. Don't worry, its makes useful and very simple tu use.
-%
 
 % Create diagram object
 % This object will contain all the information
@@ -39,30 +37,24 @@ RF_180.flip_angle = 180;
 ADC = DIAGRAM.add_adc('ADC');
 
 % Create SliceSelective Gradient "setter"
-G_SS090set      = DIAGRAM.add_gradient('G_SS090set');
-G_SS090set.type = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
+G_SS090set = DIAGRAM.add_gradient_slice_selection('G_SS090set');
 
 % Create SliceSelective Gradient "rewinder"
-G_SS090rew           = DIAGRAM.add_gradient('G_SS090rew');
-G_SS090rew.type      = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
+G_SS090rew           = DIAGRAM.add_gradient_slice_selection('G_SS090rew');
 G_SS090rew.magnitude = -1;
 
 % Create PhaseEncoding Gradient "setter"
-G_PEset      = DIAGRAM.add_gradient('G_PEset');
-G_PEset.type = mrisd.grad_type.phase_encoding;
+G_PEset = DIAGRAM.add_gradient_phase_encoding('G_PEset');
 
 % Create SliceRefocussing Gradient "setter"
-G_SS180set      = DIAGRAM.add_gradient('G_SS180set');
-G_SS180set.type = mrisd.grad_type.slice_selection; % grad_type is an enumeration, use [TAB] for auto-completion
+G_SS180set = DIAGRAM.add_gradient_slice_selection('G_SS180set');
 
 % Create ReadOut gradient "prephase"
-G_ROpre           = DIAGRAM.add_gradient('G_ROpre');
-G_ROpre.type      = mrisd.grad_type.readout;
+G_ROpre           = DIAGRAM.add_gradient_readout('G_ROpre');
 G_ROpre.magnitude = -1;
 
 % Create ReadOut gradient for ADC
-G_ROadc      = DIAGRAM.add_gradient('G_ROadc');
-G_ROadc.type = mrisd.grad_type.readout;
+G_ROadc      = DIAGRAM.add_gradient_readout('G_ROadc');
 
 ECHO           = DIAGRAM.add_echo('ECHO');
 ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
@@ -74,8 +66,7 @@ nextRF            = DIAGRAM.add_rf_pulse('nextRF');
 nextRF.flip_angle = RF_090.flip_angle;
 nextRF.magnitude  = RF_090.magnitude;
 
-nextGSS      = DIAGRAM.add_gradient('nextGSS');
-nextGSS.type = G_SS090set.type; % grad_type is an enumeration, use [TAB] for auto-completion
+nextGSS      = DIAGRAM.add_gradient_slice_selection('nextGSS');
 
 annot_TR     = DIAGRAM.add_annotation('TR');
 
@@ -124,7 +115,7 @@ G_ROpre.set_offset_at_elem_onset(G_ROadc);
 annot_halfTE.set_onset_and_duration(RF_090.middle, TE/2);
 annot_TE.    set_onset_and_duration(RF_090.middle, TE  );
 
-% for TR visualization : 
+% for TR visualization :
 
 nextRF.duration = RF_090.duration;
 nextRF.set_middle_using_TRTE(RF_090.middle + TR);

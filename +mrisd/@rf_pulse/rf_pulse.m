@@ -4,6 +4,11 @@ classdef rf_pulse < mrisd.element
         
         flip_angle double
         
+        % visual
+        color    = 'red'
+        n_lob    = 2   % integer values, { 0 (no lob), 1, 2, 3, ...}
+        n_points = 100 % definition of the SINC (RF pulse)
+
     end % properties
     
     methods (Access = public)

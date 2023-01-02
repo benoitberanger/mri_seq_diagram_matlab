@@ -5,6 +5,11 @@ classdef gradient < mrisd.element
         dur_ramp_up   double
         dur_flattop   double
         dur_ramp_down double
+        
+        % visual
+        color      = 'black'
+        pe_n_lines = 5 % number of rainbows color lines
+        
     end % properties
     
     methods (Access = public)

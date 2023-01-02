@@ -2,6 +2,9 @@ classdef adc < mrisd.element
     
     properties (SetAccess = public)
         
+        % visual
+        color = [0.5 0.5 0.5] % gray
+        
     end % properties
     
     methods (Access = public)
