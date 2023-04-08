@@ -7,8 +7,8 @@ classdef gradient < mrisd.element
         dur_ramp_down double
         
         % visual
-        color      = 'black'
-        pe_n_lines = 5 % number of rainbows color lines
+        color                = 'black' % can be char or a vect3
+        n_lines       double = 1       % 1 will use the color field, 2+ will be a rainbow
         
     end % properties
     

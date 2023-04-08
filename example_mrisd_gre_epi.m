@@ -39,7 +39,7 @@ G_SSrew.magnitude = -1;
 % Create EPI block
 block_EPI = DIAGRAM.add_block_epi('block_EPI');
 block_EPI.epi.n_pe = 11; % number of phase encoding steps (lines)
-block_EPI.generate_epi_block();
+block_EPI.generate_block();
 
 nextRF            = DIAGRAM.add_rf_pulse('nextRF');
 nextRF.flip_angle = RF_alpha.flip_angle;

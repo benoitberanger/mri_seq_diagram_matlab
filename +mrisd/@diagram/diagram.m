@@ -9,13 +9,15 @@ classdef diagram < handle
     
     properties( SetAccess = protected )
         
-        element_array = {} % adc, gradient, echo ...
-        block_array   = {} % epi block
+        element_array cell   = {} % adc, gradient, echo ...
+        block_array   cell   = {} % epi block
+        t_min         double = 0  % X axis min/max
+        t_max         double = 0  % X axis min/max
         
         fig % pointer to the figure
         ax  % pointer to the axes array
         
-        channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
+        channel_type cell = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
         
     end % properties
     
@@ -53,6 +55,10 @@ classdef diagram < handle
             obj      = self.add_block('mrisd.block', name);
             obj.type = mrisd.block_type.epi;
         end % function
+        function obj = add_block_diff(self, name)
+            obj      = self.add_block('mrisd.block', name);
+            obj.type = mrisd.block_type.diff;
+        end % function
         
         %------------------------------------------------------------------
         function obj = add_adc(self, name)
@@ -86,11 +92,9 @@ classdef diagram < handle
             end
             
             % get first and last timepoint
-            t_min = 0;
-            t_max = 0;
             for el = 1 : length(self.element_array)
-                t_min = min(t_min, self.element_array{el}.onset );
-                t_max = max(t_max, self.element_array{el}.offset);
+                self.t_min = min(self.t_min, self.element_array{el}.onset );
+                self.t_max = max(self.t_max, self.element_array{el}.offset);
             end
             
             % open fig
@@ -110,14 +114,14 @@ classdef diagram < handle
                 % create axes, the place holder hor each curve type == channel
                 ax(a) = axes(self.fig); %#ok<LAXES>
                 hold(ax(a), 'on')
-                ax(a).XLim = [t_min t_max];
+                ax(a).XLim = [self.t_min self.t_max];
                 
                 % on a figure, (0,0) "origin" point is at bottom left corner
                 %                      x    y                      w    h
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.94 y_space*0.90];
                 
                 if ~strcmp( self.channel_type{a} , '' )
-                    plot(ax(a), [t_min t_max], [0 0], 'Color', self.color_midline)
+                    plot(ax(a), [self.t_min self.t_max], [0 0], 'Color', self.color_midline)
                 end
                 
                 % seperate objects & plot curves
@@ -146,13 +150,7 @@ classdef diagram < handle
                         where_obj = find(is_obj);
                         where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.slice_selection), self.element_array(where_obj)) );
                         
-                        for i = 1 : numel(where_obj)
-                            obj = self.element_array{where_obj(i)};
-                            plot( ax(a), ...
-                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
-                                [0          obj.magnitude              obj.magnitude                              0          ], ...
-                                'Color',obj.color)
-                        end
+                        self.draw_lob(where_obj, ax(a));
                         
                     case 'G_PE' %------------------------------------------
                         
@@ -160,55 +158,15 @@ classdef diagram < handle
                         where_obj = find(is_obj);
                         where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.phase_encoding), self.element_array(where_obj)) );
                         
-                        for i = 1 : numel(where_obj)
-                            obj = self.element_array{where_obj(i)};
-                            
-                            if obj.pe_n_lines > 1
-                                
-                                % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
-                                colors = jet(2*obj.pe_n_lines+1);
-                                
-                                if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
-                                    colors = flipud(colors);
-                                end
-                                
-                                count = 0;
-                                for line = -obj.pe_n_lines : obj.pe_n_lines
-                                    count = count + 1;
-                                    plot( ax(a), ...
-                                        [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
-                                        [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.pe_n_lines), ...
-                                        'Color',colors(count,:))
-                                end
-                                if sign(obj.magnitude) == 1
-                                    y_arraow = +[ax(a).Position(2)                   ax(a).Position(2)+ax(a).Position(4)]*obj.magnitude;
-                                else
-                                    y_arraow = -[ax(a).Position(2)+ax(a).Position(4) ax(a).Position(2)                  ]*obj.magnitude;
-                                end
-                                annotation(self.fig,'arrow', [1 1]*get_absolute_fig_pos_x(ax(a), obj.onset, t_min, t_max), y_arraow)
-                            else
-                                
-                                plot( ax(a), ...
-                                    [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
-                                    [0          obj.magnitude              obj.magnitude                              0         ], ...
-                                    'Color',obj.color)
-                                
-                            end
-                        end
+                        self.draw_lob(where_obj, ax(a));
                         
                     case 'G_RO' %------------------------------------------
                         
                         is_obj = cellfun(@(x) isa(x,'mrisd.gradient'), self.element_array);
                         where_obj = find(is_obj);
-                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.readout       ), self.element_array(where_obj)) );
+                        where_obj = where_obj( cellfun(@(x) strcmp(x.type, mrisd.grad_type.readout), self.element_array(where_obj)) );
                         
-                        for i = 1 : numel(where_obj)
-                            obj = self.element_array{where_obj(i)};
-                            plot( ax(a), ...
-                                [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
-                                [0          obj.magnitude              obj.magnitude                              0         ], ...
-                                'Color',obj.color)
-                        end
+                        self.draw_lob(where_obj, ax(a));
                         
                     case 'ADC' %-------------------------------------------
                         
@@ -261,8 +219,8 @@ classdef diagram < handle
                         for i = 1 : numel(where_obj)
                             obj = self.element_array{where_obj(i)};
                             
-                            x1 = get_absolute_fig_pos_x(ax(a), obj.onset , t_min, t_max);
-                            x2 = get_absolute_fig_pos_x(ax(a), obj.offset, t_min, t_max);
+                            x1 = self.get_absolute_fig_pos_x(ax(a), obj.onset );
+                            x2 = self.get_absolute_fig_pos_x(ax(a), obj.offset);
                             y1 = ax(a).Position(2) + ax(a).Position(4)*spacing*i;
                             y2 = y1;
                             
@@ -283,7 +241,7 @@ classdef diagram < handle
                 ax(a).YAxis.Color        = ax(a).Parent.Color;
                 ax(a).YLabel.Color       = [0 0 0];
                 ax(a).YLim               = [-1 +1];
-                ax(a).XLim               = [t_min t_max];
+                ax(a).XLim               = [self.t_min self.t_max];
                 ax(a).FontWeight         = 'bold';
                 ax(a).XTick              = [];
                 ax(a).YTick              = [];
@@ -343,9 +301,53 @@ classdef diagram < handle
         
     end % methods
     
+    methods (Access = protected)
+        
+        function draw_lob(self, where_obj, ax)
+            
+            for i = 1 : numel(where_obj)
+                obj = self.element_array{where_obj(i)};
+                
+                if obj.n_lines > 1
+                    
+                    % specific color managment, we use jet (from blue to red) to show early vs late phase encoding lines
+                    colors = jet(2*obj.n_lines+1);
+                    
+                    if sign(obj.magnitude) == -1 % reverse order when magnitude is negative
+                        colors = flipud(colors);
+                    end
+                    
+                    count = 0;
+                    for line = -obj.n_lines : obj.n_lines
+                        count = count + 1;
+                        plot( ax, ...
+                            [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
+                            [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.n_lines), ...
+                            'Color',colors(count,:))
+                    end
+                    if sign(obj.magnitude) == 1
+                        y_arraow = +[ax.Position(2)                   ax.Position(2)+ax.Position(4)]*obj.magnitude;
+                    else
+                        y_arraow = -[ax.Position(2)+ax.Position(4) ax.Position(2)                  ]*obj.magnitude;
+                    end
+                    annotation(self.fig,'arrow', [1 1]*self.get_absolute_fig_pos_x(ax, obj.onset), y_arraow)
+                
+                else
+                    
+                    plot( ax, ...
+                        [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
+                        [0          obj.magnitude              obj.magnitude                              0         ], ...
+                        'Color',obj.color)
+                    
+                end
+            end
+            
+        end % function
+        
+        function x_fig = get_absolute_fig_pos_x(self, ax, x_ax)
+            x_fig = ax.Position(1) + (x_ax-self.t_min)*ax.Position(3)/(self.t_max-self.t_min);
+        end
+        
+    end % methods
+    
 end % classdef
-
-
-function x_fig = get_absolute_fig_pos_x(ax, x_ax, t_min, t_max)
-    x_fig = ax.Position(1) + (x_ax-t_min)*ax.Position(3)/(t_max-t_min);
-end

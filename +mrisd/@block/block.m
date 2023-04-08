@@ -2,11 +2,12 @@ classdef block < mrisd.element
     
     properties (SetAccess = public)
         
-        type  char   % use mrisd.block_type.[TAB] // controlled by a setter method
+        type  char     % use mrisd.block_type.[TAB] // controlled by a setter method
         color = struct % need to overload it (since its abstract)
         
         % block stuff
-        epi = struct('n_pe', 9);
+        epi  struct = struct('n_pe', 9);
+        diff struct = struct('n_pe', 9, 'n_diff', 16);
         
     end % properties
     
@@ -22,6 +23,17 @@ classdef block < mrisd.element
             switch self.type
                 case mrisd.block_type.epi
                     self.update_epi_elements();
+                case mrisd.block_type.diff
+                    self.update_diff_elements();
+            end
+        end % function
+        
+        function generate_block(self)
+            switch self.type
+                case mrisd.block_type.epi
+                    self.generate_epi_block();
+                case mrisd.block_type.diff
+                    self.generate_diff_block();
             end
         end % function
         
@@ -36,6 +48,8 @@ classdef block < mrisd.element
             switch value
                 case mrisd.block_type.epi
                     self.type = value;
+                case mrisd.block_type.diff
+                    self.type = value;
                 otherwise
                     error('block %s does not exist', value)
             end % switch
@@ -43,7 +57,31 @@ classdef block < mrisd.element
         
     end % methods
     
-    methods (Access = public)
+    methods (Access = protected)
+        
+        %------------------------------------------------------------------
+        % block functions : diff
+        
+        function generate_diff_block(self)
+            self.add_gradient_slice_selection([self.name '::G_Z']);
+            self.add_gradient_phase_encoding ([self.name '::G_Y']);
+            self.add_gradient_readout        ([self.name '::G_X']);
+        end % end
+        
+        function update_diff_elements(self)
+            GX = self.get_elem([self.name '::G_X']);
+            GY = self.get_elem([self.name '::G_Y']);
+            GZ = self.get_elem([self.name '::G_Z']);
+            GX.set_total_duration(self.duration);
+            GY.set_total_duration(self.duration);
+            GZ.set_total_duration(self.duration);
+            GX.set_onset_and_duration(self.onset, self.duration);
+            GY.set_onset_and_duration(self.onset, self.duration);
+            GZ.set_onset_and_duration(self.onset, self.duration);
+            GX.n_lines = self.diff.n_diff;
+            GY.n_lines = self.diff.n_diff;
+            GZ.n_lines = self.diff.n_diff;
+        end % function
         
         %------------------------------------------------------------------
         % block functions : epi
@@ -105,7 +143,7 @@ classdef block < mrisd.element
                 PE_i.set_total_duration(RO_i.dur_ramp_up);
                 PE_i.set_onset_at_elem_onset(RO_i);
                 PE_i.color = 'black';
-                PE_i.pe_n_lines = 1;
+                PE_i.n_lines = 1;
             end
             
             RO_pre = self.get_elem('G_blockEPI_ROpre');
@@ -116,13 +154,9 @@ classdef block < mrisd.element
             PE_pre.set_total_duration((PE_i.duration * self.epi.n_pe)/2);
             PE_pre.set_offset_at_elem_onset(self.get_elem('G_blockEPI_PE_1'));
             PE_pre.color = 'black';
-            PE_pre.pe_n_lines = 1;
+            PE_pre.n_lines = 1;
             
         end % function
-        
-    end % methods
-    
-    methods (Access = protected)
         
         %------------------------------------------------------------------
         % commun methods
