@@ -105,7 +105,7 @@ classdef block < mrisd.element
                 PE_i.set_total_duration(RO_i.dur_ramp_up);
                 PE_i.set_onset_at_elem_onset(RO_i);
                 PE_i.color = 'black';
-                PE_i.pe_n_lines = 1;
+                PE_i.n_lines = 1;
             end
             
             RO_pre = self.get_elem('G_blockEPI_ROpre');
@@ -116,7 +116,7 @@ classdef block < mrisd.element
             PE_pre.set_total_duration((PE_i.duration * self.epi.n_pe)/2);
             PE_pre.set_offset_at_elem_onset(self.get_elem('G_blockEPI_PE_1'));
             PE_pre.color = 'black';
-            PE_pre.pe_n_lines = 1;
+            PE_pre.n_lines = 1;
             
         end % function
         

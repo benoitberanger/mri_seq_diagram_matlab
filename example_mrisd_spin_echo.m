@@ -45,6 +45,7 @@ G_SS090rew.magnitude = -1;
 
 % Create PhaseEncoding Gradient "setter"
 G_PEset = DIAGRAM.add_gradient_phase_encoding('G_PEset');
+G_PEset.n_lines = 5;
 
 % Create SliceRefocussing Gradient "setter"
 G_SS180set = DIAGRAM.add_gradient_slice_selection('G_SS180set');

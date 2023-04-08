@@ -8,7 +8,7 @@ classdef gradient < mrisd.element
         
         % visual
         color      = 'black'
-        pe_n_lines = 5 % number of rainbows color lines
+        n_lines = 1 % 1 will use the color field, 2+ will be a rainbow
         
     end % properties
     
