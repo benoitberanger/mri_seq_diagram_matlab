@@ -2,12 +2,12 @@ classdef block < mrisd.element
     
     properties (SetAccess = public)
         
-        type  char   % use mrisd.block_type.[TAB] // controlled by a setter method
+        type  char     % use mrisd.block_type.[TAB] // controlled by a setter method
         color = struct % need to overload it (since its abstract)
         
         % block stuff
-        epi  = struct('n_pe', 9);
-        diff = struct('n_pe', 9, 'n_diff', 16);
+        epi  struct = struct('n_pe', 9);
+        diff struct = struct('n_pe', 9, 'n_diff', 16);
         
     end % properties
     
@@ -157,10 +157,6 @@ classdef block < mrisd.element
             PE_pre.n_lines = 1;
             
         end % function
-        
-    end % methods
-    
-    methods (Access = protected)
         
         %------------------------------------------------------------------
         % commun methods

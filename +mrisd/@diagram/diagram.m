@@ -9,15 +9,15 @@ classdef diagram < handle
     
     properties( SetAccess = protected )
         
-        element_array = {} % adc, gradient, echo ...
-        block_array   = {} % epi block
-        t_min = 0 % X axis min/max
-        t_max = 0 % X axis min/max
+        element_array cell   = {} % adc, gradient, echo ...
+        block_array   cell   = {} % epi block
+        t_min         double = 0  % X axis min/max
+        t_max         double = 0  % X axis min/max
         
         fig % pointer to the figure
         ax  % pointer to the axes array
         
-        channel_type  = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
+        channel_type cell = {'RF', 'G_SS', 'G_PE', 'G_RO', 'ADC', ''}
         
     end % properties
     
