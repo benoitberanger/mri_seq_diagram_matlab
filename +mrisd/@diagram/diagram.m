@@ -55,6 +55,10 @@ classdef diagram < handle
             obj      = self.add_block('mrisd.block', name);
             obj.type = mrisd.block_type.epi;
         end % function
+        function obj = add_block_diff(self, name)
+            obj      = self.add_block('mrisd.block', name);
+            obj.type = mrisd.block_type.diff;
+        end % function
         
         %------------------------------------------------------------------
         function obj = add_adc(self, name)
