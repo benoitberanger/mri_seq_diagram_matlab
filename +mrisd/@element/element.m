@@ -76,7 +76,7 @@ classdef (Abstract) element < handle
         end
         
         %------------------------------------------------------------------
-        function set_onset_and_duration(self, onset,duration)
+        function set_onset_and_duration(self, onset, duration)
             self.onset    = onset;
             self.duration = duration;
             self.offset   = onset + duration;

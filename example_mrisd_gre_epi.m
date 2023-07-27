@@ -73,7 +73,7 @@ RF_alpha.set_as_initial_element(pulse_dur); % set duration(use input argument), 
 
 G_SSset.set_flattop_on_rf(RF_alpha); % will set all timings
 
-G_SSrew.set_total_duration(RF_alpha.duration/2); % will set all .dur*, but no .onset or .offset
+G_SSrew.set_moment(G_SSset.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
 G_SSrew.set_onset_at_elem_offset(G_SSset);
 
 block_EPI.duration = epi_block_duration;

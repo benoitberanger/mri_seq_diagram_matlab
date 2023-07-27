@@ -101,7 +101,7 @@ ECHO.set_using_ADC(ADC);
 
 G_SS090set.set_flattop_on_rf(RF_090); % will set all timings
 
-G_SS090rew.set_total_duration(RF_090.duration/2); % will set all .dur*, but no .onset or .offset
+G_SS090rew.set_moment(G_SS090set.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
 G_SS090rew.set_onset_at_elem_offset(G_SS090set);
 
 G_PEset.set_total_duration(grad_dur);
@@ -110,7 +110,7 @@ G_PEset.set_onset_at_elem_offset(G_SS090rew);
 G_SS180set.set_flattop_on_rf(RF_180);
 
 G_ROadc.set_flattop_on_adc(ADC);
-G_ROpre.set_total_duration(ADC.duration/2);
+G_ROpre.set_moment(G_ROadc.get_prephase_moment());
 G_ROpre.set_offset_at_elem_onset(G_ROadc);
 
 annot_halfTE.set_onset_and_duration(RF_090.middle, TE/2);

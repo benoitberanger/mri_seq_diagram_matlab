@@ -96,7 +96,7 @@ RF_180.set_middle_using_TRTE(RF_090.middle + TE/2); % this sets .middle, then th
 
 G_SS090set.set_flattop_on_rf(RF_090); % will set all timings
 
-G_SS090rew.set_total_duration(RF_090.duration/2); % will set all .dur*, but no .onset or .offset
+G_SS090rew.set_moment(G_SS090set.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
 G_SS090rew.set_onset_at_elem_offset(G_SS090set);
 
 G_SS180set.set_flattop_on_rf(RF_180);

@@ -43,11 +43,10 @@ Most features are describes in the examples bellow.
 I found the "annotations" not very pleasing. For the moment, they are considered as objects, exactly just likes the other RF, gradient, ADC, elements. Maybe there is a better strategy... I'm opened to suggestions.
 
 ## TODO
-- add more methods for objects placmeent
+- add more methods for objects placement
 - change gradient objects behaviour : for the moment, there are by default defined using ratios between flattop and rampup/rampdown so they look like trapeze. An option to force flattop=0 and make them lool like triangles is to come.
 - better annotation system
-- more blocks (just EPI for now)
-- different paradigm for gradient lobs : they do **not** represent real gradient moments, whoever, in MRI physics, it's the **A**rea**U**nder**C**urve (integral) that matters. A method to set SliceSelection_**Rewinder** AUC half the SliceSelection_**Setter** would be welcome.
+- more blocks (just EPI & diffusion for now)
 - different RF pulse shapes (just sinc for now)
 - draw a kind of rectangle arround a "block" (like EPI) to show it's a whole block
 
