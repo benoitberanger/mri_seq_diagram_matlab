@@ -72,7 +72,7 @@ classdef gradient < mrisd.element
         end % fcn
 
         function set_moment(self, moment)
-            m = moment/abs(self.magnitude);
+            m = abs(moment)/abs(self.magnitude);
             self.dur_ramp_up   = m*2 * 0.125;
             self.dur_flattop   = m   * 0.750;
             self.dur_ramp_down = m*2 * 0.125;
