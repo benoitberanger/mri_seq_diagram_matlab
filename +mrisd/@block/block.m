@@ -120,6 +120,9 @@ classdef block < mrisd.element
                 self.add_adc (sprintf('G_blockEPI_ADC_%d', i_pe));
                 obj = self.add_echo(sprintf('G_blockEPI_Echo_%d', i_pe));
                 obj.magnitude = magnitude(i_pe);
+                if isfield(self.color, 'echo')
+                    obj.color = self.color.echo;
+                end
             end
 
         end % end
