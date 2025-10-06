@@ -19,24 +19,25 @@ TR = 10;
 % Create diagram object
 % This object will contain all the information
 % All rf, gradient, adc objects are also objects, contained in a diagram
-DIAGRAM = mrisd.diagram('gradient_echo');
+DIAGRAM = mrisd.diagram('bSSFP');
 
 
 %% Create each graphic element and set their paramters except position in time
 
 % Create RF excitation
 RF            = DIAGRAM.add_rf_pulse('RF');
+RF.type = 'rect';
 RF.flip_angle = 90;
 
 % Create ADC
 ADC = DIAGRAM.add_adc('ADC');
 
-% Create SliceSelective Gradient "setter"
-G_SSset = DIAGRAM.add_gradient_slice_selection('G_SSset');
-
-% Create SliceSelective Gradient "rewinder"
-G_SSrew           = DIAGRAM.add_gradient_slice_selection('G_SSrew');
-G_SSrew.magnitude = -1;
+% Create 3D encoding Gradient "setter" & "rewider"
+G_3Dset = DIAGRAM.add_gradient_slice_selection('G_3Dset');
+G_3Dset.n_lines = 3;
+G_3Drew = DIAGRAM.add_gradient_slice_selection('G_3Drew');
+G_3Drew.n_lines = G_3Dset.n_lines;
+G_3Drew.magnitude = -1;
 
 % Create PhaseEncoding Gradient "setter" & "rewinder"
 G_PEset = DIAGRAM.add_gradient_phase_encoding('G_PEset');
@@ -48,6 +49,8 @@ G_PErew.magnitude = -1;
 % Create ReadOut gradient "prephase"
 G_ROpre           = DIAGRAM.add_gradient_readout('G_ROpre');
 G_ROpre.magnitude = -1;
+G_ROrew           = DIAGRAM.add_gradient_readout('G_ROrew');
+G_ROrew.magnitude = -1;
 
 % Create ReadOut gradient for ADC
 G_ROadc      = DIAGRAM.add_gradient_readout('G_ROadc');
@@ -56,16 +59,12 @@ G_ROadc      = DIAGRAM.add_gradient_readout('G_ROadc');
 ECHO           = DIAGRAM.add_echo('ECHO');
 ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
 
-% Create SliceSpoiler gradient
-G_SSpoil = DIAGRAM.add_gradient_readout('G_SSpoil');
-
 annot_TE = DIAGRAM.add_annotation('TE');
 
 nextRF            = DIAGRAM.add_rf_pulse('nextRF');
+nextRF.type       = RF.type;
 nextRF.flip_angle = RF.flip_angle;
 nextRF.magnitude  = RF.magnitude;
-
-nextGSS      = DIAGRAM.add_gradient_slice_selection('nextGSS');
 
 annot_TR     = DIAGRAM.add_annotation('TR');
 
@@ -94,32 +93,28 @@ ECHO.set_using_ADC(ADC);
 
 % Now place gradients
 
-G_SSset.set_flattop_on_rf(RF); % will set all timings
-
-G_SSrew.set_moment(G_SSset.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
-G_SSrew.set_onset_at_elem_offset(G_SSset);
+G_ROadc.set_flattop_on_adc(ADC);
+G_ROpre.set_moment(G_ROadc.get_prephase_moment()/2);
+G_ROpre.set_offset_at_elem_onset(G_ROadc);
+G_ROrew.set_moment(G_ROadc.get_prephase_moment()/2);
+G_ROrew.set_onset_at_elem_offset(G_ROadc);
 
 G_PEset.set_total_duration(grad_dur);
-G_PEset.set_onset_at_elem_offset(G_SSrew);
-
-G_ROadc.set_flattop_on_adc(ADC);
-G_ROpre.set_moment(G_ROadc.get_prephase_moment());
-G_ROpre.set_offset_at_elem_onset(G_ROadc);
-
-G_SSpoil.set_moment(G_SSrew.get_total_moment());
-G_SSpoil.set_onset_at_elem_offset(G_ROadc);
-
+G_PEset.set_offset_at_elem_onset(G_ROpre);
 G_PErew.set_total_duration(grad_dur);
-G_PErew.set_onset_at_elem_offset(G_SSpoil);
+G_PErew.set_onset_at_elem_offset(G_ROrew);
 
-annot_TE.set_onset_and_duration(RF.middle, TE);
+G_3Dset.set_total_duration(grad_dur);
+G_3Dset.set_onset_at_elem_onset(G_PEset);
+G_3Drew.set_total_duration(grad_dur);
+G_3Drew.set_onset_at_elem_onset(G_PErew);
+
+annot_TE.set_onset_and_duration(RF.middle, TE  );
 
 % for TR visualization :
 
 nextRF.duration = RF.duration;
 nextRF.set_middle_using_TRTE(RF.middle + TR);
-
-nextGSS.set_flattop_on_rf(nextRF);
 
 annot_TR.set_onset_and_duration(RF.middle, TR);
 
@@ -130,5 +125,5 @@ annot_TR.set_onset_and_duration(RF.middle, TR);
 DIAGRAM.Draw();
 
 % save the fig :
-% DIAGRAM.save_fig('diagram_gre.png')
-% DIAGRAM.save_fig('diagram_gre.svg')
+% DIAGRAM.save_fig('diagram_bSSFP_3D_NSel.png')
+% DIAGRAM.save_fig('diagram_bSSFP_3D_NSel.svg')

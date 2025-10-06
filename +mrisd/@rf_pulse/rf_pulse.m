@@ -2,6 +2,7 @@ classdef rf_pulse < mrisd.element
     
     properties (SetAccess = public)
         
+        type       char    {mustBeMember(type,{'sinc','rect','hs'})} = 'sinc'
         flip_angle double
         
         % visual

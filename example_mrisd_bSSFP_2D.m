@@ -140,5 +140,5 @@ annot_TR.set_onset_and_duration(RF.middle, TR);
 DIAGRAM.Draw();
 
 % save the fig :
-% DIAGRAM.save_fig('diagram_bSSFP.png')
-% DIAGRAM.save_fig('diagram_bSSFP.svg')
+% DIAGRAM.save_fig('diagram_bSSFP_2D.png')
+% DIAGRAM.save_fig('diagram_bSSFP_2D.svg')
