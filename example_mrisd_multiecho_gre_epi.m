@@ -121,5 +121,5 @@ annot_TR.set_onset_and_duration(RF_alpha.middle, TR);
 DIAGRAM.Draw();
 
 % save the fig :
-% DIAGRAM.save_fig('multiecho_gre_epi.png')
-% DIAGRAM.save_fig('multiecho_gre_epi.svg')
+% DIAGRAM.save_fig('diagram_multiecho_gre_epi.png')
+% DIAGRAM.save_fig('diagram_multiecho_gre_epi.svg')

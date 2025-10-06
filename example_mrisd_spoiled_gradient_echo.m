@@ -25,18 +25,18 @@ DIAGRAM = mrisd.diagram('gradient_echo');
 %% Create each graphic element and set their paramters except position in time
 
 % Create RF excitation
-RF_090            = DIAGRAM.add_rf_pulse('RF_090');
-RF_090.flip_angle = 90;
+RF            = DIAGRAM.add_rf_pulse('RF');
+RF.flip_angle = 90;
 
 % Create ADC
 ADC = DIAGRAM.add_adc('ADC');
 
 % Create SliceSelective Gradient "setter"
-G_SS090set = DIAGRAM.add_gradient_slice_selection('G_SS090set');
+G_SSset = DIAGRAM.add_gradient_slice_selection('G_SSset');
 
 % Create SliceSelective Gradient "rewinder"
-G_SS090rew           = DIAGRAM.add_gradient_slice_selection('G_SS090rew');
-G_SS090rew.magnitude = -1;
+G_SSrew           = DIAGRAM.add_gradient_slice_selection('G_SSrew');
+G_SSrew.magnitude = -1;
 
 % Create PhaseEncoding Gradient "setter" & "rewinder"
 G_PEset = DIAGRAM.add_gradient_phase_encoding('G_PEset');
@@ -57,13 +57,13 @@ ECHO           = DIAGRAM.add_echo('ECHO');
 ECHO.asymmetry = 0.50; % default = 0.5 (middle), range from 0 to 1
 
 % Create SliceSpoiler gradient
-G_SSpoil = DIAGRAM.add_gradient_slice_selection('G_SSpoil');
+G_SSpoil = DIAGRAM.add_gradient_readout('G_SSpoil');
 
 annot_TE = DIAGRAM.add_annotation('TE');
 
 nextRF            = DIAGRAM.add_rf_pulse('nextRF');
-nextRF.flip_angle = RF_090.flip_angle;
-nextRF.magnitude  = RF_090.magnitude;
+nextRF.flip_angle = RF.flip_angle;
+nextRF.magnitude  = RF.magnitude;
 
 nextGSS      = DIAGRAM.add_gradient_slice_selection('nextGSS');
 
@@ -86,41 +86,42 @@ annot_TR     = DIAGRAM.add_annotation('TR');
 
 % Place the main objects, used to define TE, TE/2, ...
 
-RF_090.set_as_initial_element(pulse_dur); % set duration(use input argument), .onset = 0, ...
+RF.set_as_initial_element(pulse_dur); % set duration(use input argument), .onset = 0, ...
 
 ADC.duration = grad_dur;
-ADC.set_middle_using_TRTE(RF_090.middle + TE);
+ADC.set_middle_using_TRTE(RF.middle + TE);
 ECHO.set_using_ADC(ADC);
 
 % Now place gradients
 
-G_SS090set.set_flattop_on_rf(RF_090); % will set all timings
+G_SSset.set_flattop_on_rf(RF); % will set all timings
 
-G_SS090rew.set_moment(G_SS090set.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
-G_SS090rew.set_onset_at_elem_offset(G_SS090set);
+G_SSrew.set_moment(G_SSset.get_rewind_moment()); % will set all .dur*, but no .onset or .offset
+G_SSrew.set_onset_at_elem_offset(G_SSset);
 
 G_PEset.set_total_duration(grad_dur);
-G_PEset.set_onset_at_elem_offset(RF_090);
+G_PEset.set_onset_at_elem_offset(G_SSrew);
 
 G_ROadc.set_flattop_on_adc(ADC);
 G_ROpre.set_moment(G_ROadc.get_prephase_moment());
-G_ROpre.set_onset_at_elem_offset(RF_090);
+G_ROpre.set_offset_at_elem_onset(G_ROadc);
+
+G_SSpoil.set_moment(G_SSrew.get_total_moment());
+G_SSpoil.set_onset_at_elem_offset(G_ROadc);
 
 G_PErew.set_total_duration(grad_dur);
-G_PErew.set_onset_at_elem_offset(ADC);
-G_SSpoil.set_moment(G_SS090rew.get_total_moment());
-G_SSpoil.set_onset_at_elem_offset(ADC);
+G_PErew.set_onset_at_elem_offset(G_SSpoil);
 
-annot_TE.set_onset_and_duration(RF_090.middle, TE  );
+annot_TE.set_onset_and_duration(RF.middle, TE);
 
 % for TR visualization :
 
-nextRF.duration = RF_090.duration;
-nextRF.set_middle_using_TRTE(RF_090.middle + TR);
+nextRF.duration = RF.duration;
+nextRF.set_middle_using_TRTE(RF.middle + TR);
 
 nextGSS.set_flattop_on_rf(nextRF);
 
-annot_TR.set_onset_and_duration(RF_090.middle, TR);
+annot_TR.set_onset_and_duration(RF.middle, TR);
 
 
 %% Now we draw
@@ -129,5 +130,5 @@ annot_TR.set_onset_and_duration(RF_090.middle, TR);
 DIAGRAM.Draw();
 
 % save the fig :
-% DIAGRAM.save_fig('gre.png')
-% DIAGRAM.save_fig('gre.svg')
+% DIAGRAM.save_fig('diagram_gre.png')
+% DIAGRAM.save_fig('diagram_gre.svg')

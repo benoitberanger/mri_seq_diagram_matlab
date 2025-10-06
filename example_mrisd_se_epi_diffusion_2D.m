@@ -133,5 +133,5 @@ annot_TR.set_onset_and_duration(RF_090.middle, TR);
 DIAGRAM.Draw();
 
 % save the fig :
-% DIAGRAM.save_fig('spin_echo.png')
-% DIAGRAM.save_fig('spin_echo.svg')
+% DIAGRAM.save_fig('diagram_spin_echo.png')
+% DIAGRAM.save_fig('diagram_spin_echo.svg')
