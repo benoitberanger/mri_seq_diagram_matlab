@@ -94,20 +94,20 @@ ECHO.set_using_ADC(ADC);
 % Now place gradients
 
 G_ROadc.set_flattop_on_adc(ADC);
-G_ROpre.set_moment(G_ROadc.get_prephase_moment()/2);
+G_ROpre.set_moment(G_ROadc.get_prephase_moment());
 G_ROpre.set_offset_at_elem_onset(G_ROadc);
-G_ROrew.set_moment(G_ROadc.get_prephase_moment()/2);
+G_ROrew.set_moment(G_ROadc.get_prephase_moment());
 G_ROrew.set_onset_at_elem_offset(G_ROadc);
 
 G_PEset.set_total_duration(grad_dur);
-G_PEset.set_offset_at_elem_onset(G_ROpre);
+G_PEset.set_offset_at_elem_offset(G_ROpre);
 G_PErew.set_total_duration(grad_dur);
-G_PErew.set_onset_at_elem_offset(G_ROrew);
+G_PErew.set_onset_at_elem_onset(G_ROrew);
 
 G_3Dset.set_total_duration(grad_dur);
-G_3Dset.set_onset_at_elem_onset(G_PEset);
+G_3Dset.set_offset_at_elem_offset(G_ROpre);
 G_3Drew.set_total_duration(grad_dur);
-G_3Drew.set_onset_at_elem_onset(G_PErew);
+G_3Drew.set_onset_at_elem_onset(G_ROrew);
 
 annot_TE.set_onset_and_duration(RF.middle, TE  );
 
