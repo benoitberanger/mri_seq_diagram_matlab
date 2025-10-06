@@ -123,9 +123,9 @@ nextRF.duration = RF.duration;
 nextRF.set_middle_using_TRTE(RF.middle + TR);
 
 nextGSSset.set_flattop_on_rf(nextRF);
-nextGSSpre.set_moment(G_SSset.get_rewind_moment()/2);
+nextGSSpre.set_moment(G_SSset.get_rewind_moment());
 nextGSSpre.set_offset_at_elem_onset(nextGSSset);
-nextGSSrew.set_moment(G_SSset.get_rewind_moment()/2);
+nextGSSrew.set_moment(G_SSset.get_rewind_moment());
 nextGSSrew.set_onset_at_elem_offset(nextGSSset);
 
 G_PErew.set_total_duration(grad_dur);
