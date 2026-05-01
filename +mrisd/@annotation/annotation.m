@@ -4,7 +4,7 @@ classdef annotation < mrisd.element
         
         % visual
         color = struct(...
-            'arrow'  , [0.9 0.9 0.9] ,... % light gray
+            'arrow'  , [0.7 0.7 0.7] ,... % light gray
             'vbar'   , [0.9 0.9 0.9]  ... % light gray
             )
         

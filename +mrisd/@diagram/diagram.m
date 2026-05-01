@@ -3,6 +3,8 @@ classdef diagram < handle
     properties( SetAccess = public )
 
         color_midline = [0.8 0.8 0.8] % light gray
+        linewidth = 2
+        fontsize = 20
         name char
 
     end % properties
@@ -121,7 +123,7 @@ classdef diagram < handle
                 ax(a).InnerPosition = [0.05 (nChan-a)*y_space+0.01 0.94 y_space*0.90];
 
                 if ~strcmp( self.channel_type{a} , '' )
-                    plot(ax(a), [self.t_min self.t_max], [0 0], 'Color', self.color_midline)
+                    plot(ax(a), [self.t_min self.t_max], [0 0], 'Color', self.color_midline, 'LineWidth',self.linewidth)
                 end
 
                 % seperate objects & plot curves
@@ -156,7 +158,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 x, ...
                                 y*obj.magnitude,...
-                                'Color',obj.color)
+                                'Color',obj.color, 'LineWidth',self.linewidth)
                         end
 
                     case 'G_SS' %------------------------------------------
@@ -194,7 +196,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 [obj.onset obj.onset     obj.offset     obj.offset], ...
                                 [0         obj.magnitude obj.magnitude  0         ], ...
-                                'Color',obj.color)
+                                'Color',obj.color, 'LineWidth',self.linewidth)
                         end
 
                         % Echo
@@ -220,7 +222,7 @@ classdef diagram < handle
                             plot( ax(a), ...
                                 x, ...
                                 y*obj.magnitude,...
-                                'Color',obj.color)
+                                'Color',obj.color, 'LineWidth',self.linewidth)
                         end
 
                     case ''% annotations ----------------------------------
@@ -241,7 +243,8 @@ classdef diagram < handle
 
                             annotation(self.fig,'doublearrow', [x1 x2], [y1 y2],'Color',obj.color.arrow)
                             annotation(self.fig,'textbox', [x1+(x2-x1)/2 y1 0 0], 'String', obj.name,...
-                                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', 'Interpreter', 'none')
+                                'HorizontalAlignment', 'center', 'VerticalAlignment', 'middle', 'Interpreter', 'none', ...
+                                'FontSize', self.fontsize*1.5, 'FontWeight','bold')
                             annotation(self.fig,'line', [x1 x1], [y1 1], 'LineStyle','-','Color',obj.color.vbar)
                             annotation(self.fig,'line', [x2 x2], [y1 1], 'LineStyle','-','Color',obj.color.vbar)
                         end
@@ -255,6 +258,7 @@ classdef diagram < handle
                 ax(a).XAxis.Color        = ax(a).Parent.Color;
                 ax(a).YAxis.Color        = ax(a).Parent.Color;
                 ax(a).YLabel.Color       = [0 0 0];
+                ax(a).YLabel.FontSize    = self.fontsize;
                 ax(a).YLim               = [-1 +1];
                 ax(a).XLim               = [self.t_min self.t_max];
                 ax(a).FontWeight         = 'bold';
@@ -338,7 +342,7 @@ classdef diagram < handle
                         plot( ax, ...
                             [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset]                         , ...
                             [0          obj.magnitude              obj.magnitude                              0         ] * (line/obj.n_lines), ...
-                            'Color',colors(count,:))
+                            'Color',colors(count,:), 'LineWidth',self.linewidth)
                     end
                     if sign(obj.magnitude) == 1
                         y_arraow = +[ax.Position(2)                   ax.Position(2)+ax.Position(4)]*obj.magnitude;
@@ -352,7 +356,7 @@ classdef diagram < handle
                     plot( ax, ...
                         [obj.onset  obj.onset+obj.dur_ramp_up  obj.onset+obj.dur_ramp_up+obj.dur_flattop  obj.offset] , ...
                         [0          obj.magnitude              obj.magnitude                              0         ], ...
-                        'Color',obj.color)
+                        'Color',obj.color, 'LineWidth',self.linewidth)
 
                 end
             end
